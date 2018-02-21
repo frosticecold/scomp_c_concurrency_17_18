@@ -25,7 +25,7 @@ int main()
 
 
     //answer starts here
-    int half = n / 2;
+    int half = ARRAY_SIZE / 2;
     int count = 0;
     int pid_status = 0;
     pid_t pid_f = fork();
