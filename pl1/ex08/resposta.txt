@@ -1,0 +1,14 @@
+A)In the shell, list the running processes with 
+ps (look for the PIDs printed). 
+Are all parent and child processes listed? Why? 
+
+R:Não, apenas está listado um processo pai e um processo zombie filho.
+Está listado o processo zombie, porque o processo pai não processou a informação do processo zombie.
+
+B)Is there anything particular about the child process? Explain
+R: Sim, simplesmente o processo acabou antes do pai, tornando-o um processo zombie, libertando
+toda a informação da memória dele.
+O processo tornou-se um processo zombie, pois o processo pai não processou a informação do 1º processo filho
+
+
+C) kill -KILL pid
