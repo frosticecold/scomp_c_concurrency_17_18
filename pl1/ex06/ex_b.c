@@ -8,9 +8,11 @@ void main()
 
     for (i = 0; i < 4; i++)
     {
-        if (fork() == 0)
+        pid_t pid = fork();
+        if (pid == 0)
         {
             sleep(1); /*sleep(): unistd.h*/
+            break;
         }
     }
     printf("This is the end. \n");

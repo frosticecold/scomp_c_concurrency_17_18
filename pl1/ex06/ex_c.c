@@ -13,6 +13,7 @@ void main()
         if (pid == 0)
         {
             sleep(1); /*sleep(): unistd.h*/
+            break;
         }
         if (pid > 0)
         {
