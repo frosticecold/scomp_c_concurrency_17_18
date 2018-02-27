@@ -17,6 +17,9 @@ void main()
         }
         if (pid > 0)
         {
+            if(pid %2 == 0){
+                printf("We will wait for: %d\n",pid);
+            }
             //printf("Reached here: %d",pid);
             int status;
             if (pid % 2 == 0)

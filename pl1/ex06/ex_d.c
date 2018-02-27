@@ -3,19 +3,19 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+
 void main()
 {
     int i;
     int status;
-
-    for (i = 0; i < 4; i++)
+    pid_t pid;
+    for (i = 0; i < 4; ++i)
     {
-        pid_t pid = fork();
-        int exitcde;
+        pid = fork();
         if (pid == 0)
         {
             sleep(1); /*sleep(): unistd.h*/
-            exit(i + 1);
+            break;
         }
         if (pid > 0)
         {
@@ -32,4 +32,7 @@ void main()
         }
     }
     printf("This is the end. \n");
+    if(pid == 0){
+        exit(i+1);
+    }
 }
