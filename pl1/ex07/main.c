@@ -41,7 +41,7 @@ int main()
             {
                 if (numbers[i] == n)
                 {
-                    count++;
+                    ++count;
                 }
             }
             printf("Contador filho:%d\n", count);
@@ -53,7 +53,7 @@ int main()
             {
                 if (numbers[i] == n)
                 {
-                    count++;
+                    ++count;
                 }
             }
             waitpid(pid_f, &pid_status, 0);
