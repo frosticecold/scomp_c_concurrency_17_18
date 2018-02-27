@@ -1,6 +1,6 @@
 #Ignore all
 *
-*vscode*
+*.out
 
 #Unignore files named Makefile and makefile 
 !Makefile
