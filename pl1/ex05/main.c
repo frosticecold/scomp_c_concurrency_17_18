@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void main()
+int main()
 {
     int status_p1, status_p2;
     pid_t pid1 = fork();
@@ -47,4 +47,5 @@ void main()
             printf("Pai: %d retournou o valor %d\n", pid2, WEXITSTATUS(status_p2));
         }
     }
+    return 0;
 }

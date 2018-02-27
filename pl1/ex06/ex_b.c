@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
-void main()
+int main()
 {
     int i;
-    int status;
+    //int status;
 
     for (i = 0; i < 4; i++)
     {
@@ -16,4 +16,5 @@ void main()
         }
     }
     printf("This is the end. \n");
+    return 0;
 }

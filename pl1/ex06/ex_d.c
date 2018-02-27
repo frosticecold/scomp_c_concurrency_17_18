@@ -4,10 +4,9 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 
-void main()
+int main()
 {
     int i;
-    int status;
     pid_t pid;
     for (i = 0; i < 4; ++i)
     {
@@ -35,4 +34,5 @@ void main()
     if(pid == 0){
         exit(i+1);
     }
+    return 0;
 }
