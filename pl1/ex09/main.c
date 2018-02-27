@@ -10,7 +10,6 @@ int main()
 {
 
     int i;
-    int count = 0;
     int process_num = 0;
     pid_t proc[NUM_PROC];
     int status[NUM_PROC];
