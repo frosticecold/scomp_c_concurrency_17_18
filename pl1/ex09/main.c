@@ -13,30 +13,30 @@ int main()
     int process_num = 0;
     pid_t proc[NUM_PROC];
     int status[NUM_PROC];
-    for (i = 0; i < NUM_PROC; i++) // para NUM_PROC
+    for (i = 0; i < NUM_PROC; i++) // para o NUM_PROC
     {
         process_num = i;
-        proc[i] = fork();
-        status[i] = 0;
-        if (proc[i] == -1)
+        proc[process_num] = fork();
+        status[process_num] = 0;
+        if (proc[process_num] == -1)
         {
             return EXIT_FAILURE;
         }
         else
         {
-            if (proc[i] == 0)
+            if (proc[process_num] == 0)
             {
                 break;
             }
         }
     }
 
-    if (proc[process_num] == 0)
+    if (proc[process_num] == 0)//Se for o processo filho então vamos contar
     {
         int n;
-        (process_num == 0) ? (n=1) : (n=process_num*100+1); //em que número comeºar
-        int lim =  n + NUM_WRITES; //qual o limite da escrita
-        for (; n < lim; ++n) 
+        (process_num == 0) ? (n = 1) : (n = process_num * 100 + 1); //em que número comeºar
+        int lim = n + NUM_WRITES;                                   //qual o limite da escrita
+        for (; n < lim; ++n)
         {
             printf("Count:%d\n", n);
         }

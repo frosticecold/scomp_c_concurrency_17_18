@@ -25,11 +25,11 @@ int main()
 
 
     //answer starts here
-    int half = ARRAY_SIZE / 2;
+    int half = ARRAY_SIZE / 2; //Metade do array
     int count = 0;
     int pid_status = 0;
     pid_t pid_f = fork();
-    if (pid_f == -1)
+    if (pid_f == -1) //Se der erro
     {
         return EXIT_FAILURE;
     }

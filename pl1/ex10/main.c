@@ -39,7 +39,7 @@ int main()
         }
     }
 
-    if (i < 10)
+    if (i < 10) // Se não for o processo pai, pois o pai acaba o ciclo for com i=10
     {
         if (vecpid[i] == 0)
         {
@@ -47,14 +47,23 @@ int main()
             int indice;
             int fim;
             (i > 0) ? ((indice = i * LIM_SUP, fim = (i * LIM_SUP) + LIM_SUP)) : (indice = 0, fim = LIM_SUP);
-            for (; indice < fim; ++indice)
+            /*  Caso seja a primeira iteração, o indice é 0 e o fim é o LIM_SUP
+                Caso seja as outras iterações, então o indice é indice = i*LIM_SUP
+                E o fim é fim = (i*LIM_SUP) + LIM_SUP
+                Exemplo, i=1
+                indice = 1*200, indice =200
+                fim = (1*200) + 200
+                fim = 400
+            */
+
+            for (; indice < fim; ++indice) //Percorre de indice até fim -1
             {
-                if (vec[indice] == n)
+                if (vec[indice] == n)//Se for igual
                 {
                     exit(indice - (LIM_SUP * i));
                 }
             }
-            exit(255);
+            exit(255);//se chegou aqui é porque não encontrou nenhum número
         }
     }
     for (i = 0; i < NUM_PROC; ++i)
@@ -63,22 +72,25 @@ int main()
         { // Se for o pai
             int p;
             int status[NUM_PROC];
-            for (p = 0; p < NUM_PROC; ++p)
+            for (p = 0; p < NUM_PROC; ++p)//Então vamos esperar por todos os processos
             {
                 waitpid(vecpid[p], &status[p], 0);
             }
-            for (i = 0; i < NUM_PROC; ++i)
+            for (i = 0; i < NUM_PROC; ++i)//Depois de esperar
             {
-                if (WIFEXITED(status[i]))
+                if (WIFEXITED(status[i]))//Se acabou
                 {
                     int indice = WEXITSTATUS(status[i]);
-                    if (indice != 255)
+                    //Vamos buscar o indice compreendido entre 0-200
+                    if (indice != 255)//Se não for o indice do erro
                     {
                         int validIndex = indice + (LIM_SUP * i);
+                        //Indice valido é indice + (lim_sup * i)
                         printf("Valid index:%d\n", validIndex);
                     }
                     else
                     {
+                        //Senão é indice inválido
                         printf("Invalid index pid: %d\n", vecpid[i]);
                     }
                 }
