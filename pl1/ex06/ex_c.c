@@ -2,28 +2,24 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#define NUM_PROC 4
 int main()
 {
     int i;
-
-    for (i = 0; i < 4; i++)
+    pid_t pid;
+    for (i = 0; i < NUM_PROC; i++)//Criar 4 processos
     {
-        pid_t pid = fork();
-        if (pid == 0)
+        pid = fork();
+        if (pid == 0)//Se for filho então dormir
         {
             sleep(1); /*sleep(): unistd.h*/
             break;
         }
         if (pid > 0)
         {
-            if(pid %2 == 0){
+            if(pid %2 == 0){//Se for um processo par
                 printf("We will wait for: %d\n",pid);
-            }
-            //printf("Reached here: %d",pid);
-            int status;
-            if (pid % 2 == 0)
-            {
-                waitpid(pid, &status, 0);
+                waitpid(pid, NULL, 0);
             }
         }
     }
