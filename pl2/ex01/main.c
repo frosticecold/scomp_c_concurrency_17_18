@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <string.h>
 
-#define BUF_SIZE 64
 int main()
 {
     pid_t pid;
