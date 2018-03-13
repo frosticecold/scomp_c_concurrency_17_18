@@ -22,15 +22,21 @@ int main()
     }
     if (pid > 0)                // verificar se é processo pai
     {
-        close(fd[0]);           // cmo vai ser escrito fechar pipe para leitura
+        close(fd[0]);           // como vai ser escrito fechar pipe para leitura
         printf("---Parent printing---\nPID: %d\n", pid);    // imprimir  pid de pai
-        write(fd[1], (void *)&pid, sizeof(pid));            //fazer a esccrita para o pipe
+        if(write(fd[1], (void *)&pid, sizeof(pid)) == -1){
+            perror("Erro escrita"); //fazer a escrita para o pipe
+            return EXIT_FAILURE;
+        }
         close(fd[1]);           //fechar o pipe para escrita
     }
     if (pid == 0)               // verificar se é porcesso filho
     {
         close(fd[1]);           //fechar pipe para escrita
-        read(fd[0], (void *)&pid, sizeof(pid));     //fazer a leitura do pipe
+        if (read(fd[0], (void *)&pid, sizeof(pid)) == -1){
+            perror("Erro Leitura"); //fazer a leitura do pipe
+            return EXIT_FAILURE;
+        }
         printf("---Child printing---\nPID: %d\n", pid);     
         close(fd[0]);           //  fechar pipe de leitura
     }
