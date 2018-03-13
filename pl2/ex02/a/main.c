@@ -8,43 +8,65 @@
 #define BUF_SIZE 64
 int main()
 {
-    int numbuf=0;
-    char buf[BUF_SIZE];
-    int fd[2]; //PIPE
-    if(pipe(fd) == -1){
+    int numbuf = 0;     //Buffer para leitura de um numero
+    char buf[BUF_SIZE]; //Buffer para leitura de uma string
+    int fd[2];          //PIPE
+    if (pipe(fd) == -1)
+    { //Vamos criar o pipe
+        //Se falhar então erro
         perror("Erro ao criar o pipe.");
         return EXIT_FAILURE;
     }
-    pid_t pid = fork();
+    pid_t pid = fork(); //Criar um processo filho
 
-    if (pid == -1)
+    if (pid == -1) //Se falhou ao criar o processo filho
     {
         return EXIT_FAILURE;
     }
     else
     {
-        if (pid > 0)
+        if (pid > 0) // Se for o processo pai
         {
-            close(fd[0]);//Fechar a leitura do pai
+            close(fd[0]); //Fechar a leitura do pai
+
             printf("[PAI] Vamos ler a string:");
-            fgets(buf,BUF_SIZE,stdin);
+            fgets(buf, BUF_SIZE, stdin);
+
             buf[strlen(buf)] = '\0';
+
             printf("\n[PAI] Vamos ler o inteiro: ");
-            scanf("%d",&numbuf);
-            //printf("\n[PAI]String:%s\n[PAI]Inteiro:%d\n",buf,numbuf);
-            write(fd[1],(void*)&buf,BUF_SIZE);
-            write(fd[1],(void*)&numbuf,sizeof(int));
-            close(fd[1]);
-            wait(NULL);
+            scanf("%d", &numbuf);
+
+            if (write(fd[1], (void *)&buf, BUF_SIZE) == -1) //Escrever a string
+            {
+                perror("Erro ao escrever a string.");
+                return EXIT_FAILURE;
+            }
+
+            if (write(fd[1], (void *)&numbuf, sizeof(int))) //Escrever o inteiro
+            {
+                perror("Erro ao escrever o inteiro.");
+                return EXIT_FAILURE;
+            }
+
+            close(fd[1]); // Fechar a extremidade de escrita do pipe.
+            wait(NULL);   //Esperar pelo filho
         }
         else
         {
-            close(fd[1]);//Fechar a escrita do filho
-            read(fd[0],(void*)&buf,BUF_SIZE);//Ler a string
-            read(fd[0],(void*)&numbuf,sizeof(int));
-            printf("\n[FILHO]String:%s\n[FILHO]Inteiro:%d\n",buf,numbuf);
+            close(fd[1]);                                  //Fechar a escrita do filho
+            if (read(fd[0], (void *)&buf, BUF_SIZE) == -1) //Ler a string
+            {
+                perror("Erro ao ler a string.");
+                return EXIT_FAILURE;
+            }
+            if (read(fd[0], (void *)&numbuf, sizeof(int)) == -1)
+            { //Ler o inteiro
+                perror("Erro ao ler o inteiro.");
+                return EXIT_FAILURE;
+            }
+            printf("\n[FILHO]String:%s\n[FILHO]Inteiro:%d\n", buf, numbuf);
             close(fd[0]);
-
         }
     }
     return 0;

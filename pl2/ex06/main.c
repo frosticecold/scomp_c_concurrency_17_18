@@ -12,16 +12,18 @@
 
 int main()
 {
-    int arr_one[ARR_SIZE], arr_two[ARR_SIZE];
+    int arr_one[ARR_SIZE], arr_two[ARR_SIZE]; //Dois arrays
     srand(time(NULL));
     int sum = 0;
     int p;
-    int fd[2];
-    if (pipe(fd) == -1)
-    {
-        perror("pipe");
+    int fd[2]; //Pipe
+
+    if (pipe(fd) == -1) //Criar o pipe,
+    {                   //Se der erro
+        perror("Erro ao criar o pipe.");
         return EXIT_FAILURE;
     }
+
     for (p = 0; p < ARR_SIZE; ++p)
     { //preencher arrays
         /*         arr_one[p]=rand() % RANGE;
@@ -50,21 +52,30 @@ int main()
                 {
                     sum += arr_one[initialIndex] + arr_two[initialIndex]; //Somar cada elemento vo vetor
                 }
-                write(fd[1], (void *)&sum, sizeof(sum)); //Escrever apenas uma vez no pipe
-                close(fd[1]);                            //Fechar a escrita
-                exit(0);                                 //Terminar o filho
+                if (write(fd[1], (void *)&sum, sizeof(sum)) == -1)
+                { //Escrever apenas uma vez no pipe
+                    perror("Erro de escrita no pipe.");
+                    return EXIT_FAILURE;
+                }
+                close(fd[1]); //Fechar a escrita
+                exit(0);      //Terminar o filho
             }
         }
     }
-    for (p = 0; p < NUM_PROC; ++p)//para todos os processos
+    for (p = 0; p < NUM_PROC; ++p) //para todos os processos
     {
         int status;
-        waitpid(vec_pid[p], &status, 0);//vamos esperar todos os processos
-        if (WIFEXITED(status))//Se acabou com sucesso
+        waitpid(vec_pid[p], &status, 0); //vamos esperar todos os processos
+        if (WIFEXITED(status))           //Se acabou com sucesso
         {
             int readnum = 0;
-            read(fd[0], (void *)&readnum, sizeof(status));//Vamos ler o número que foi sumado pelo filho
-            sum += readnum;//Adicionar à soma
+            if (read(fd[0], (void *)&readnum, sizeof(status)) == -1)
+            {   //Vamos ler o número que foi somado pelo filho
+                //Se der erro, escrever erro
+                perror("Erro de leitura no pipe.");
+                return EXIT_FAILURE;
+            }
+            sum += readnum; //Adicionar à soma
         }
         else
         {
