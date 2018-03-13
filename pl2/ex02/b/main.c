@@ -51,7 +51,7 @@ int main()
             wait(NULL);   // Esperar pelo filho
         }
         else
-        {
+        {//Se for o filho
             close(fd[1]); //Fechar a escrita do filho
             if (read(fd[0], (void *)&st, sizeof(st)) == -1)
             {
@@ -60,6 +60,7 @@ int main()
             }                                                                     //Ler a estrutura
             printf("\n[FILHO]String:%s\n[FILHO]Inteiro:%d\n", st.buf, st.numbuf); //Escrever para a consola a estrutura
             close(fd[0]);
+            exit(0);
         }
     }
     return 0;

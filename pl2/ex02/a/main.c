@@ -53,7 +53,7 @@ int main()
             wait(NULL);   //Esperar pelo filho
         }
         else
-        {
+        {//Se for o filho
             close(fd[1]);                                  //Fechar a escrita do filho
             if (read(fd[0], (void *)&buf, BUF_SIZE) == -1) //Ler a string
             {
@@ -67,6 +67,7 @@ int main()
             }
             printf("\n[FILHO]String:%s\n[FILHO]Inteiro:%d\n", buf, numbuf);
             close(fd[0]);
+            exit(0);
         }
     }
     return 0;
