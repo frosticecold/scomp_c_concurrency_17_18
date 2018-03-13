@@ -27,8 +27,15 @@ int main()
     if (pid > 0) //processo pai
     {
         close(fd[0]);
-        write(fd[1], (void *)hello, 20);     //fazer a escrita "Hello World" para o pipe
-        write(fd[1], (void *)goodbye, 20); //fazer a escrita "Goodbye" para o pipe
+        if(write(fd[1], (void *)hello, 20) == -1){  //fazer a escrita "Hello World" para o pipe
+            perror("Erro Escrita");
+            return EXIT_FAILURE;
+        }
+        if(write(fd[1], (void *)goodbye, 20) == -1) //fazer a escrita "Goodbye" para o pipe
+        {
+            perror("Erro Escrita");
+            return EXIT_FAILURE;
+        }
         close(fd[1]);                                    //fechar o pipe para escrita
         wait(&status);
         if(WIFEXITED(status))
@@ -39,8 +46,14 @@ int main()
     if (pid == 0)
     {
         close(fd[1]);
-        read(fd[0], (void *)hello, 20 );     //fazer a leitura "Hello World" para o pipe
-        read(fd[0], (void *)goodbye, 20 ); //fazer a leitura "Goodbye" para o pipe
+        if(read(fd[0], (void *)hello, 20 ) == -1){  //fazer a leitura "Hello World" para o pipe
+            perror("Erro leitura Hello world");
+            return EXIT_FAILURE;
+        }
+        if(read(fd[0], (void *)goodbye, 20 ) == -1){  //fazer a leitura "Goodbye" para o pipe
+            perror("Erro leitura Goodbye");
+            return EXIT_FAILURE;
+        }
         printf("---Child---\n%s\n%s\n",hello,goodbye);
         close(fd[0]);                                       //fechar o pipe para escrita
         exit(2);
