@@ -11,7 +11,7 @@ int main()
     pid_t pid2;
     if (pid1 == -1)//Se erro
     {
-        printf("ERRO");
+        perror("ERRO");
         exit(255);//Erro
     }
     if (pid1 == 0)
@@ -24,7 +24,7 @@ int main()
         pid2 = fork();//Criar filho
         if (pid2 == -1)//Se der erro
         {
-            printf("ERRO");
+            perror("ERRO");
             exit(255);//Então erro
         }
         if (pid2 == 0)//
