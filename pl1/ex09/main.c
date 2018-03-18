@@ -22,12 +22,9 @@ int main()
         {
             return EXIT_FAILURE;
         }
-        else
+        if (proc[process_num] == 0)
         {
-            if (proc[process_num] == 0)
-            {
-                break;
-            }
+            break;
         }
     }
 

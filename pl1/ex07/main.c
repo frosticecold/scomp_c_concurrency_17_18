@@ -31,6 +31,7 @@ int main()
     pid_t pid_f = fork();
     if (pid_f == -1) //Se der erro
     {
+        perror("Erro na criação do processo");
         return EXIT_FAILURE;
     }
     else
