@@ -56,8 +56,8 @@ int main()
         for (i = 1; i <= MAX_LINES; i++)
         {
             char str[BUF_SIZE];
-            sprintf(str, "Line %d\n", i);
-            if (write(fd[1], (void *)str, BUF_SIZE) == -1)
+            sprintf(str, "%s%d%s","Line ", i,"\n");
+            if (write(fd[1],(void*)str, strlen(str)) == -1)
             {
                 perror("Erro ao escrever no pipe");
                 return EXIT_FAILURE;
