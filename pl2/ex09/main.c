@@ -3,7 +3,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
 
 #define VEC_SIZE 50000
