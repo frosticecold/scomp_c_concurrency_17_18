@@ -10,7 +10,7 @@ void exec_ls(int pipe1[2]);
 void exec_sort(int pipe1[2], int pipe2[2]);
 void exec_wc(int pipe2[2]);
 
-#define NUM_ARGS 3
+//#define NUM_ARGS 3
 int main(int argc, char **argv)
 {
     /*     if (argc < NUM_ARGS)

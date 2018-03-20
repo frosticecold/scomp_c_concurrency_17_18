@@ -1,0 +1,12 @@
+O propósito deste código é criar 4 processos filho.
+Cada processo filho criado,cria apenas um processo filho
+E associa um pipe entre pai <-> filho
+STDOUT -> extremidade de escrita do pipe
+STDIN -> EXTREMIDADE DE LEITURA DO pipe
+
+Cria um "circulo" entre os processos através do stdout/stdin
+O output é do processo pai -> processo filho
+Sendo o último filho ligado com o pai através do stdout/stdin
+A informação passada entre processos é a informação o número do processo,
+o número do processo pai e seguido do número do processo atual
+O output é o processo atual + a informação restante no pipe anteriormente descrita.
