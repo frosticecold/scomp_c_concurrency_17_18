@@ -14,17 +14,17 @@ int main()
     //strncpy(buf,"ls",BUFSIZE);
     int ret = 0;
     ret = my_exec("ls");
-    if (ret != 0)
+    if (ret == 1)
     {
         printf("Error executing!");
     }
     ret=my_exec("who");
-    if (ret != 0)
+    if (ret == 1)
     {
         printf("Error executing!");
     }
     ret=my_exec("ps");
-    if (ret != 0)
+    if (ret == 1)
     {
         printf("Error executing!");
     }
@@ -45,6 +45,7 @@ int my_exec(char *command)
         if (pid == 0)
         {
             ret = execlp(command, command, NULL);
+            if(ret == -1) ret = 1;
             exit(ret);
         }
         else
