@@ -133,7 +133,7 @@ int main()
             if (read(pipe_father_to_child[0], (void *)&buffer, sizeof(int)) == -1)
             {
                 perror("Erro ao ler no processo filho.");
-                return EXIT_FAILURE;
+                exit(1);
             }
             podeApostar = buffer;
             /*
@@ -152,7 +152,7 @@ int main()
                 if (write(pipe_child_to_father[1], (void *)&bet, sizeof(int)) == -1)
                 {
                     perror("Erro ao escrever no processo filho.");
-                    return EXIT_FAILURE;
+                    exit(1);
                 }
                 /*
                 ==================================================================
@@ -162,7 +162,7 @@ int main()
                 if (read(pipe_father_to_child[0], (void *)&buffer, sizeof(int)) == -1)
                 {
                     perror("Erro ao ler no processo filho.");
-                    return EXIT_FAILURE;
+                    exit(1);
                 }
                 int credito = buffer;
                 printf("\n======\nA aposta do filho é:%d\nO crédito do filho é:%d\n======", bet, credito);
