@@ -21,6 +21,7 @@ int randomNumber()
 int father(int  pipes[NUM_PROCESSOS + 1][2])
 {
     int greaterNumber;
+    int j;
     // Processo pai
     int r = randomNumber();
     printf("---Processo pai PID:   %d--- Numero Gerado: %d\n", getpid(), r);
@@ -31,6 +32,13 @@ int father(int  pipes[NUM_PROCESSOS + 1][2])
         return EXIT_FAILURE;
     }
     close(pipes[0][WRITE]);
+
+    
+    for (j = 0; j < NUM_PROCESSOS; j++)
+    { //fechar pipes que pai nao utiliza
+        close(pipes[j][READ]);
+        close(pipes[j][WRITE]);
+    }
 
     close(pipes[NUM_PROCESSOS][WRITE]);
     if (read(pipes[NUM_PROCESSOS][READ], (void *)&greaterNumber, sizeof(int)) == -1)
