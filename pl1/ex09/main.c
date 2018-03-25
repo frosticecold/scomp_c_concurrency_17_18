@@ -20,6 +20,7 @@ int main()
         status[process_num] = 0;
         if (proc[process_num] == -1)
         {
+            perror("Erro na criação de processo");
             return EXIT_FAILURE;
         }
         if (proc[process_num] == 0)

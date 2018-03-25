@@ -12,7 +12,8 @@ int main()
     }
     /*so e imprimido uma vez o text SCOMP, pois o sucesso do comando 
     execlp() so executa uma vez, pois em caso de alguma falha o comando seria repetido 
-    na proxima iteração e assim sucessivamente.  
+    na proxima iteração e assim sucessivamente. Pois o codigo sequente é automaticamente substituido 
+    pelo execlp uma vez executado corretamente 
     */
     return 0;
 }

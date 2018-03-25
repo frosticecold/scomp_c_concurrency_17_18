@@ -40,13 +40,10 @@ int main(){
         int limitPerCycle;
         int beginingCycle;
         int max = -1;          //declaraçao de valor min para comparacao
-        if(i == 0){ //caso seja o maxIntervalValue zero tem um tratamento especial
-            beginingCycle=0;
-            limitPerCycle = LIMIT_BY_PROCESS;
-        }else{     
-            beginingCycle=i*LIMIT_BY_PROCESS;   //tratamento de inicio de ciclo (1 * 200 = 200) começa na posicao 200
-            limitPerCycle = (i+1) * LIMIT_BY_PROCESS; //tratamento de fim de ciclo ((1+1) * 200 = 400) o seu limite será 400 (nao incluido)
-        }
+             
+        beginingCycle=i*LIMIT_BY_PROCESS;   //tratamento de inicio de ciclo (1 * 200 = 200) começa na posicao 200
+        limitPerCycle = beginingCycle + LIMIT_BY_PROCESS; //tratamento de fim de ciclo ((1+1) * 200 = 400) o seu limite será 400 (nao incluido)
+
         for(i=beginingCycle;i<limitPerCycle;++i){
             if(vec_values[i]>max){
                 max=vec_values[i]; 
@@ -65,15 +62,18 @@ int main(){
         {
             if (WIFEXITED(status[p]))//Se acabou
             {
-                int maxIntervalValue = WEXITSTATUS(status[p]);
+                int maxIntervalValue = WEXITSTATUS(status[p]); // atribuição do valor de exit do processo, que é maior do quinto do vetor percorrido 
                 //se acabou mostrar valor maximo do intervalo do processo 0-255
                 if (maxIntervalValue >= 0 && maxIntervalValue <= 255)//se numero valido
                 {
-                    int begin = (p==0)?0:p*LIMIT_BY_PROCESS;
-                    int end = (p==0)?LIMIT_BY_PROCESS:((p+1)*LIMIT_BY_PROCESS)-1;
+                    int begin = p*LIMIT_BY_PROCESS;
+                    int end = begin + LIMIT_BY_PROCESS-1;
                     printf("Intervalo: %d - %d Valor: %d\n", begin,end,maxIntervalValue);
                     printf("PID Id: %d\n", pid[p]);
-                }            
+                }else{
+                    printf("---Valor invalido---\n"); // senao valor acima de 255 torna valor invalido
+                    printf("PID Id: %d\n", pid[p]);
+                }          
             }
         }
     }

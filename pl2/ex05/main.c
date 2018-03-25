@@ -13,16 +13,13 @@ void convertString(char *str)
 
     while (*str != '\0')
     {
-        if (islower(*str))
+        if (islower(*str)) // se letra minuscula 
         {
-            *str = toupper(*str);
+            *str = toupper(*str);// converte para maiuscula
         }
         else
-        {
-            if (isupper(*str))
-            {
-                *str = tolower(*str);
-            }
+        {// se letra Maiuscula
+            *str = tolower(*str);// converte para minuscula
         }
         ++str;
     }

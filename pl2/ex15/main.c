@@ -8,6 +8,7 @@
 #define READ 0
 #define WRITE 1
 
+
 int main()
 {
     int pipe1[2];
@@ -55,6 +56,7 @@ int main()
             return EXIT_FAILURE;
         }
         close(pipe1[WRITE]); // fechar pipe apos escrita
+        
         close(pipe2[WRITE]); // fechar pipe escrita para fazer leitura
         char fact;
         int n = 0;

@@ -26,12 +26,12 @@ int main()
     }
     if (pid > 0) //processo pai
     {
-        close(fd[0]);
-        if(write(fd[1], (void *)hello, 20) == -1){  //fazer a escrita "Hello World" para o pipe
+        close(fd[0]);  // fechar pipe de leitura para fazer escrita 
+        if(write(fd[1], (void *)&hello, 20) == -1){  //fazer a escrita "Hello World" para o pipe
             perror("Erro Escrita");
             return EXIT_FAILURE;
         }
-        if(write(fd[1], (void *)goodbye, 20) == -1) //fazer a escrita "Goodbye" para o pipe
+        if(write(fd[1], (void *)&goodbye, 20) == -1) //fazer a escrita "Goodbye" para o pipe
         {
             perror("Erro Escrita");
             return EXIT_FAILURE;
@@ -45,17 +45,19 @@ int main()
     }
     if (pid == 0)
     {
-        close(fd[1]);
-        if(read(fd[0], (void *)hello, 20 ) == -1){  //fazer a leitura "Hello World" para o pipe
+        char readHello [20];
+        char readGoodbye [20];
+        close(fd[1]); // fecha pipe de escrita pra fazer leitura
+        if(read(fd[0], (void *)&readHello, 20 ) == -1){  //fazer a leitura "Hello World" para o pipe
             perror("Erro leitura Hello world");
             return EXIT_FAILURE;
         }
-        if(read(fd[0], (void *)goodbye, 20 ) == -1){  //fazer a leitura "Goodbye" para o pipe
+        if(read(fd[0], (void *)&readGoodbye, 20 ) == -1){  //fazer a leitura "Goodbye" para o pipe
             perror("Erro leitura Goodbye");
             return EXIT_FAILURE;
         }
-        printf("---Child---\n%s\n%s\n",hello,goodbye);
-        close(fd[0]);                                       //fechar o pipe para escrita
+        printf("---Child---\n%s\n%s\n",readHello,readGoodbye);
+        close(fd[0]);                 //fechar o pipe apos leitura
         exit(2);
     }
     return 0;

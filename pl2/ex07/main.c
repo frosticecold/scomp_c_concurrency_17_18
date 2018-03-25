@@ -7,7 +7,7 @@
 
 #define VEC_SIZE 1000
 #define NUM_PROCESSES 5
-#define LIMITE_PROCESSO 200
+#define LIMITE_PROCESSO VEC_SIZE/5
 
 void numberGenerator(int *vec)
 {
@@ -89,9 +89,9 @@ int main()
                 close(pipes[p][0]); // fechar o pipe de leitura
             }
         }
-        for (int k = 0; k < VEC_SIZE; k++)
+        for (i = 0; i < VEC_SIZE; i++)
         { // printing result of sum
-            printf("vec1[%d]+vec2[%d] = Result[%d]=%d\n",k,k,k, result[k]);
+            printf("vec1[%d] (%d) + vec2[%d] (%d) = Result[%d] = %d\n",i,vec1[i],i,vec2[i],i, result[i]);
         }
     }
     if (pid[i] == 0)
@@ -112,7 +112,7 @@ int main()
             vectemp[pos] = vec1[j] + vec2[j];
             ++pos;
         }
-        if (write(pipes[i][1], (void *)vectemp, sizeof(int) * LIMITE_PROCESSO) == -1) // escrita no pipe com teste de sucesso
+        if (write(pipes[i][1], (void *)&vectemp, sizeof(int) * LIMITE_PROCESSO) == -1) // escrita no pipe com teste de sucesso
         {
             perror("Erro escrita pelo Filho");
             return EXIT_FAILURE;

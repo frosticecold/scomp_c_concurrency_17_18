@@ -3,23 +3,23 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #define VEC_SIZE 50000
 #define NUM_PROCESSOS 10
-#define LIMITE_PROCESSO 5000
+#define LIMITE_PROCESSO VEC_SIZE/10
 #define CRITERIA 20
 
 void populateProducts(Product *product)
 {
     int i = 0;
-    int dummyValue = 21;
     for (; i < VEC_SIZE; i++)
     {
+        srand(time(NULL)*getpid());
         product->customer_code = i;
-        product->product_code = dummyValue;
-        product->quantity = dummyValue;
-        dummyValue++;
+        product->product_code = rand() % 30;
+        product->quantity = rand() % 30;
         ++product;
     }
 }
@@ -27,7 +27,7 @@ void populateProducts(Product *product)
 int main()
 {
     Product sales[VEC_SIZE];
-    populateProducts(sales);
+    populateProducts(sales); // popular vetor sales
     int products[VEC_SIZE];
 
     pid_t pid[NUM_PROCESSOS];
@@ -107,20 +107,15 @@ int main()
                 */
                 int venda = 0;
                 int n = 1;
-                while (1)
+                while ((n = read(pipes[p][0], (void *)&venda, sizeof(int))) > 0 )
                 {
-                    n = read(pipes[p][0], (void *)&venda, sizeof(int));
-                    if (n == 0)
-                    { // se nao houve leitura termina o ciclo
-                        break;
-                    }
                     products[totalSales] = venda;
-                    totalSales++;
-                    if (n == -1)
-                    {
-                        perror("Erro leitura Pai");
-                        return EXIT_FAILURE;
-                    }
+                    totalSales++;    
+                }
+                if (n == -1)
+                {
+                    perror("Erro leitura Pai");
+                    return EXIT_FAILURE;
                 }
                 close(pipes[p][0]);
             }
