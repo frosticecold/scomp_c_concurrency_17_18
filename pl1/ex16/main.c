@@ -8,10 +8,6 @@ int my_exec(char *command);
 
 int main()
 {
-    //const int BUFSIZE = 64;
-    //char buf[BUFSIZE];
-    //my_exec(buf);
-    //strncpy(buf,"ls",BUFSIZE);
     int ret = 0;
     ret = my_exec("ls");
     if (ret == 1)
@@ -31,6 +27,10 @@ int main()
     return 0;
 }
 
+/*
+Função que executa um comando recebido por parâmetro
+num processo filho
+*/
 int my_exec(char *command)
 {
     int ret;
