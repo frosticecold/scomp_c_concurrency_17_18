@@ -170,7 +170,7 @@ int main()
         if (write(pipe_childs_to_father[1], (void *)&req, sizeof(req)) == -1)
         {
             perror("Erro ao escrever do filho para o pai");
-            return EXIT_FAILURE;
+            exit(1);
         }
         /*
             ==================================================================
@@ -181,7 +181,7 @@ int main()
         if (read(pipe_father_to_child[p][0], (void *)&prod, sizeof(prod)) == -1)
         {
             perror("Erro ao ler do filho para o pai");
-            return EXIT_FAILURE;
+            exit(1);
         }
         printf("Produto Nome:%s Cod:%d\n", prod.p_name, prod.p_price);
         close(pipe_father_to_child[p][0]);
