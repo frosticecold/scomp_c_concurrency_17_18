@@ -56,7 +56,7 @@ int main()
             if (read(fd[0], (void *)&st, sizeof(st)) == -1)
             {
                 perror("Erro ao ler a estrutura.");
-                return EXIT_FAILURE;
+                exit(1);
             }                                                                     //Ler a estrutura
             printf("\n[FILHO]String:%s\n[FILHO]Inteiro:%d\n", st.buf, st.numbuf); //Escrever para a consola a estrutura
             close(fd[0]);

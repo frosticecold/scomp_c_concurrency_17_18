@@ -58,12 +58,12 @@ int main()
             if (read(fd[0], (void *)&buf, BUF_SIZE) == -1) //Ler a string
             {
                 perror("Erro ao ler a string.");
-                return EXIT_FAILURE;
+                exit(1);
             }
             if (read(fd[0], (void *)&numbuf, sizeof(int)) == -1)
             { //Ler o inteiro
                 perror("Erro ao ler o inteiro.");
-                return EXIT_FAILURE;
+                exit(1);
             }
             printf("\n[FILHO]String:%s\n[FILHO]Inteiro:%d\n", buf, numbuf);
             close(fd[0]);
