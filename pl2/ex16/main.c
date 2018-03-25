@@ -79,6 +79,11 @@ int main(int argc, char **argv)
             perror("Erro ao criar o processo");
             return EXIT_FAILURE;
         }
+        /*
+    ==================================================================
+        Função WC
+    ==================================================================
+    */
         if (pid_wc == 0)
         {
             exec_wc(pipe2);
@@ -105,7 +110,7 @@ void exec_ls(int pipe1[2])
     close(pipe1[1]);
     execlp("ls", "ls", "-la", NULL);
     perror("Erro ao executar ls -la");
-    exit(0);
+    exit(1);
 }
 
 void exec_sort(int pipe1[2], int pipe2[2])
@@ -127,7 +132,7 @@ void exec_wc(int pipe2[2])
 {
     dup2(pipe2[0], STDIN_FILENO);
     //dup2(pipe2[1], STDOUT_FILENO);
-    
+
     close(pipe2[0]);
     close(pipe2[1]);
     execlp("wc", "wc", "-l", NULL);
