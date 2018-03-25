@@ -26,14 +26,14 @@ int main()
         {
             close(fd[1]); //Não queremos escrever
             int n;
-            while ((n = read(fd[0], (void *)buf, BUF_SIZE)) > 0) //Enquanto houver coisas para ler
+            while ((n = read(fd[0], (void *)buf, 1)) > 0) //Enquanto houver coisas para ler
             {
-                printf("%s", buf); //Escrever para a consola
+                printf("%c", buf[0]); //Escrever para a consola
             }
             if (n == -1)
             {
                 perror("Erro ao ler.");
-                return EXIT_FAILURE;
+                exit(1);
             }
             close(fd[0]); //Fechar o pipe
             exit(0);      //Exit com sucesso
