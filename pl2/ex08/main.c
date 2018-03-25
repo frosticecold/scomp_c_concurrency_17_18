@@ -57,7 +57,7 @@ int main()
         estrutura nova;
         if(read(fd[0], (void *)&nova, sizeof(nova))==-1){
             perror("Erro ao ler do pipe.");
-            return EXIT_FAILURE;
+            exit(1);
         }
         close(fd[0]);
         //printf("Round number:%d Msg:%s", nova.round_num, nova.msg);
