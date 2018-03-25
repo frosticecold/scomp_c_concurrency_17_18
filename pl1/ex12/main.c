@@ -8,20 +8,28 @@ int spawn_childs(int n);
 
 int main()
 {
-    const int NUM_PROC = 6; //NUM CHILDS
+    const int NUM_PROC = 6;           //NUM CHILDS
     int num = spawn_childs(NUM_PROC); // criar NUM_CHILDS
-    if (num == 0) // Se estamos no processo pai
+    if (num == 0)                     // Se estamos no processo pai
     {
         int i;
-        for (i = 0; i < NUM_PROC; ++i)//VAMOS ESPERAR NUM_PROC VEZES
+        for (i = 0; i < NUM_PROC; ++i) //VAMOS ESPERAR NUM_PROC VEZES
         {
             wait(NULL);
         }
     }
-    printf("Num processo:%d -- %d*2 = %d\n", num, num, num * 2);//Escrever output
+    printf("Num processo:%d -- %d*2 = %d\n", num, num, num * 2); //Escrever output
+    if (num > 0)
+    {
+        exit(0);
+    }
     return 0;
 }
 
+/*
+Função que cria n processos filhos
+Retorna o indice do processo
+*/
 int spawn_childs(int n)
 {
     if (n < 0)
