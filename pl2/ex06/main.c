@@ -55,7 +55,7 @@ int main()
                 if (write(fd[1], (void *)&sum, sizeof(sum)) == -1)
                 { //Escrever apenas uma vez no pipe
                     perror("Erro de escrita no pipe.");
-                    return EXIT_FAILURE;
+                    exit(1);
                 }
                 close(fd[1]); //Fechar a escrita
                 exit(0);      //Terminar o filho
