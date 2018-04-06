@@ -106,9 +106,9 @@ void delete_shared_memory(shared_memory *addr)
 }
 void cpyaluno(Aluno *dest, Aluno *src)
 {
-    dest->numero = src->numero;
-    strncpy(dest->nome, src->nome, STR_SIZE);
-    memcpy(dest->disciplinas, src->disciplinas, sizeof(int) * NR_DISC);
+    //dest->numero = src->numero;
+    //strncpy(dest->nome, src->nome, STR_SIZE);
+    memcpy(dest, src, sizeof(Aluno));
 }
 /*
     Actual exercise code
@@ -141,7 +141,7 @@ void my_code(shared_memory *addr)
             int i;
             for (i = 0; i < NR_DISC; ++i)
             {
-                printf("\nNota[%d]", i);
+                printf("\nNota[%d]", i+1);
                 scanf("%d", &input.disciplinas[i]);
             }
             cpyaluno(&addr->aluno, &input);
@@ -161,7 +161,8 @@ void my_code(shared_memory *addr)
         while (addr->state != FatherFinishedWriting)
             ;
         addr->state = ChildReading;
-        int highest, lowest, avg;
+        int highest, lowest;
+        float avg;
         int i;
         for (i = 0; i < NR_DISC; ++i)
         {
@@ -183,7 +184,7 @@ void my_code(shared_memory *addr)
         }
         avg /= NR_DISC;
         addr->state = ChildFinishedWriting;
-        printf("Aluno:%d Highest:%d Lowest:%d Avg:%d",
+        printf("Aluno:%d Highest:%d Lowest:%d Avg:%.2f",
                addr->aluno.numero, highest, lowest, avg);
         addr->state = EndCycle;
         exit(0);
