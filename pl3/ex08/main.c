@@ -81,7 +81,7 @@ shared_memory *create_shared_memory(void)
         perror("Erro ao criar memoria partilhada.");
         return NULL;
     }
-    if (ftruncate(fd, sizeof(int)) == -1)
+    if (ftruncate(fd, sizeof(shared_memory)) == -1)
     {
         perror("Erro ao truncar a memória.");
         return NULL;
