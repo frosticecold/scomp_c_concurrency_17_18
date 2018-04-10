@@ -30,7 +30,12 @@ const char *SHM_FILENAME = "/pl3_ex04";
 int main()
 {
     int *addr = create_shared_memory();
-
+    if (addr == NULL)
+    {
+        perror("Erro ao criar a memória partilhada.");
+        return EXIT_FAILURE;
+    }
+    *addr = 100;
     pid_t pid;
     if ((pid = fork()) == -1)
     {
@@ -81,9 +86,21 @@ int *create_shared_memory(void)
 }
 void delete_shared_memory(int *addr)
 {
-    munmap(addr, sizeof(int));
-    close(fd_shared);
-    shm_unlink(SHM_FILENAME);
+    if (munmap(addr, sizeof(int)) == MAP_FAILED)
+    {
+        perror("Erro ao fazer map unmapping");
+        return;
+    };
+    if (close(fd_shared) == -1)
+    {
+        perror("Erro ao fazer close.");
+        return;
+    }
+    if (shm_unlink(SHM_FILENAME) == -1)
+    {
+        perror("Erro ao fazer unlink");
+        return;
+    }
 }
 void exec_repeated_operation(char *str, int *addr)
 {
@@ -98,7 +115,7 @@ void exec_repeated_operation(char *str, int *addr)
 }
 
 /*
-Não os valores não são sempre corretos,
+Não os valores não estão sempre corretos,
 Existem duas execuções ao mesmo tempo a
 Incrementar/Decrementar a mesma variável.
 Não é possível desta maneira, garantir que
