@@ -43,7 +43,16 @@ int main()
         total+=vec[i];
     }
 
-    printf("\n\n---Print Result---\n Media é: %.2f\n", (float)total/TOTAL);
+    printf("---Print Result---\n Media é: %.2f\n", (float)total/TOTAL);
+    if(munmap(vec,data_size) == -1){//unmap de memoria com verificação de erro 
+        printf("Erro unmap");
+    }
+    if(close(fd) == -1){//close de memoria com verificação de erro 
+        printf("Erro close");
+    }
+    if(shm_unlink("/vec10") == -1){//shm_unlink de memoria para remoção de ficheiro de memoria parilhada com verificação de erro 
+        printf("Erro unlink");
+    }
 
     return 0;
 }

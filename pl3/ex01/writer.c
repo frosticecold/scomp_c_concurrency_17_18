@@ -45,6 +45,11 @@ int main()
     scanf("%s", s->name);
     printf("Insira o numero aluno: ");
     scanf("%d", &(s->number));
-    exit(0);
+    if(munmap(s,data_size) == -1){
+        printf("Erro unmap");
+    }
+    if(close(fd) == -1){
+        printf("Erro close");
+    }
     return 0;
 }

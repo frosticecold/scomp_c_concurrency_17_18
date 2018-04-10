@@ -5,6 +5,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <fcntl.h>
 #define TOTAL 10
 
@@ -38,9 +39,18 @@ int main()
         IMPRESSAO NO MONITOR DE RESULTADOS PROVENIENTES DA MEMORIA PARTILHADA ALOCADA NA ESTRUTURA DE "Student" 
     */
 
+    time_t t; /* needed to initialize random number generator (RNG) */
+    /* intializes RNG (srand():stdlib.h; time(): time.h) */
+    srand((unsigned)time(&t));
     int i =0;
     for(;i<TOTAL;i++){
-        vec[i]=i+1;
+        vec[i]=rand()%TOTAL;
+    }
+    if(munmap(vec,data_size) == -1){
+        printf("Erro unmap");
+    }
+    if(close(fd) == -1){
+        printf("Erro close");
     }
     return 0;
 }

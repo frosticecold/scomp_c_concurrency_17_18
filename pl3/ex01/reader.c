@@ -41,7 +41,16 @@ int main()
     /*
         IMPRESSAO NO MONITOR DE RESULTADOS PROVENIENTES DA MEMORIA PARTILHADA ALOCADA NA ESTRUTURA DE "Student" 
     */
-    printf("\n\n---Print Result---\nNome do aluno é : %s\nNumero: %d\n", s->name, s->number);
+    printf("---Print Result---\nNome do aluno é : %s\nNumero: %d\n", s->name, s->number);
 
+    if(munmap(s,data_size) == -1){//unmap de memoria com verificação de erro 
+        printf("Erro unmap");
+    }
+    if(close(fd) == -1){//close de memoria com verificação de erro 
+        printf("Erro close");
+    }
+    if(shm_unlink("/writer") == -1){//shm_unlink de memoria para remoção de ficheiro de memoria parilhada com verificação de erro 
+        printf("Erro unlink");
+    }
     return 0;
 }
