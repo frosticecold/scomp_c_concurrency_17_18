@@ -11,6 +11,7 @@
 
 #define BUFF_SIZE 10
 #define SHM_FILENAME "/pl3_ex10"
+#define SHM_DELETE "/dev/shm/pl3_ex10"
 #define MAX_EXCHANGES 30
 #define MAX_NUM_RAND 1000
 typedef struct
@@ -36,6 +37,11 @@ void delete_shared_memory(shared_memory *addr);
 
 int main()
 {
+    if (access(SHM_DELETE, F_OK)==0)
+    {
+        if(unlink(SHM_DELETE) < 0 )
+        perror("Erro ao apagar.");
+    }
     shared_memory *addr = create_shared_memory();
     if (addr == NULL)
     {
