@@ -18,7 +18,16 @@ typedef struct
     int buffer[BUFF_SIZE];
     /* File Descriptor */
     int fd;
-    /* Counter */
+
+    /* Turn */
+    //int turn;
+    /* */
+    //int flag[2];
+
+    int idx_prod;
+
+    int idx_cons;
+
     int counter;
 } shared_memory;
 
@@ -33,6 +42,7 @@ int main()
         perror("Erro ao criar a memória partilhada");
         return EXIT_FAILURE;
     }
+    int numExec = MAX_EXCHANGES;
     pid_t pid;
     if ((pid = fork()) == -1)
     {
@@ -48,18 +58,23 @@ int main()
     */
     if (pid > 0)
     {
-        int i, in = 0;
-        //const int STEP = 10;
-        //int num = -1;
-        for (i = 0; i < MAX_EXCHANGES; ++i)
+        srand(time(NULL));
+        const int STEP = 10;
+        int num = -1;
+        addr->counter = 0;
+        do
         {
-            while (addr->counter == BUFF_SIZE)
+            //addr->flag[id_prod] = 1;
+            //addr->turn = id_cons;
+            while (addr->idx_prod == BUFF_SIZE - 1 && addr->idx_cons == 0)
                 ;
-            srand(time(NULL) + i);
-            addr->buffer[in] = rand() % MAX_NUM_RAND;
-            in = (in + 1) % BUFF_SIZE;
-            addr->counter++;
-        }
+            while (addr->idx_prod == (addr->idx_cons - 1))
+                ;
+            (num == -1) ? (num = rand() % MAX_NUM_RAND) : (num += STEP);
+            addr->buffer[addr->idx_prod] = num;
+            (addr->idx_prod == BUFF_SIZE - 1) ? (addr->idx_prod = 0) : ((addr->idx_prod)++);
+            (addr->counter)++;
+        } while (--numExec);
         int status;
         waitpid(pid, &status, 0);
     }
@@ -71,19 +86,21 @@ int main()
     */
     else
     {
+        int counter = 0;
         do
         {
-            int i, out = 0;
-            for (i = 0; i < MAX_EXCHANGES; ++i)
-            {
-                while (addr->counter == 0)
+            if (addr->counter != MAX_EXCHANGES && addr->idx_cons == BUFF_SIZE - 1 && addr->idx_prod == 0)
+                while (addr->idx_cons == BUFF_SIZE - 1 && addr->idx_prod == 0)
                     ;
-                printf("Array[%d] = %d\n", i, addr->buffer[out]);
-                out = (out + 1) % BUFF_SIZE;
-                addr->counter--;
-            }
-            exit(0);
-        } while (1);
+            //            while (addr->flag[id_prod] && addr->turn == id_prod)
+            //              ;
+            else if (addr->counter != MAX_EXCHANGES)
+                while (addr->idx_cons == addr->idx_prod - 1)
+                    ;
+            printf("Counter[%d] Number:%d\n", counter++, addr->buffer[addr->idx_cons]);
+            (addr->idx_cons == BUFF_SIZE - 1) ? (addr->idx_cons = 0) : ((addr->idx_cons)++);
+        } while (--numExec);
+        exit(0);
     }
     delete_shared_memory(addr);
     return 0;
@@ -119,17 +136,8 @@ shared_memory *create_shared_memory(void)
 void delete_shared_memory(shared_memory *addr)
 {
     int fd = addr->fd;
-    if (munmap(addr, sizeof(shared_memory)) == -1)
-    {
-        perror("Erro ao fazer unmap");
-        return;
-    }
-    if (close(fd) == -1)
-    {
-        perror("Erro ao fechar file descriptor.");
-        return;
-    }
+    munmap(addr, sizeof(shared_memory));
+    close(fd);
     if (shm_unlink(SHM_FILENAME) == -1)
         perror("Erro ao fazer shm unlink");
-    return;
 }
