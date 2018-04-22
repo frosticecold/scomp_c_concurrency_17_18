@@ -1,10 +1,10 @@
 #vars
-INCLUDES =
-SOURCES = main.c
-OBJFILES = main.o
+INCLUDES = sm.h
+SOURCES = sm.c main.c
+OBJFILES = sm.o main.o 
 EXEC = main
 FLAGS = -Wall -g
-LIBS =  -lrt -pthread
+LIBS =  -lrt -lpthread
 # regras de sufixo
 .SUFIXES : .c .o
 
