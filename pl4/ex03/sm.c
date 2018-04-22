@@ -32,8 +32,7 @@ void delete_shared_memory(shared_memory *addr)
     int fd = addr->fd;
     munmap(addr, sizeof(shared_memory));
     close(fd);
-    if (shm_unlink(SHM_FILENAME) == -1)
-        perror("Erro ao fazer shm unlink");
+      shm_unlink(SHM_FILENAME);
 }
 void check_if_shm_exists()
 {

@@ -90,6 +90,7 @@ int main()
         }
     }
     delete_shared_memory(addr);
+    sem_unlink(semaphore);
     return 0;
 }
 void rmv_str_shm(shared_memory *addr)
