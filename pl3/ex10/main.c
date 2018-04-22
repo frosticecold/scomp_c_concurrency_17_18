@@ -20,11 +20,6 @@ typedef struct
     /* File Descriptor */
     int fd;
 
-    /* Turn */
-    //int turn;
-    /* */
-    //int flag[2];
-
     int idx_prod;
 
     int idx_cons;
@@ -37,10 +32,10 @@ void delete_shared_memory(shared_memory *addr);
 
 int main()
 {
-    if (access(SHM_DELETE, F_OK)==0)
+    if (access(SHM_DELETE, F_OK) == 0)
     {
-        if(unlink(SHM_DELETE) < 0 )
-        perror("Erro ao apagar.");
+        if (unlink(SHM_DELETE) < 0)
+            perror("Erro ao apagar.");
     }
     shared_memory *addr = create_shared_memory();
     if (addr == NULL)
@@ -98,8 +93,6 @@ int main()
             if (addr->counter != MAX_EXCHANGES && addr->idx_cons == BUFF_SIZE - 1 && addr->idx_prod == 0)
                 while (addr->idx_cons == BUFF_SIZE - 1 && addr->idx_prod == 0)
                     ;
-            //            while (addr->flag[id_prod] && addr->turn == id_prod)
-            //              ;
             else if (addr->counter != MAX_EXCHANGES)
                 while (addr->idx_cons == addr->idx_prod - 1)
                     ;
@@ -108,6 +101,11 @@ int main()
         } while (--numExec);
         exit(0);
     }
+    /*
+    ====
+    END
+    ====
+    */
     delete_shared_memory(addr);
     return 0;
 }
