@@ -1,8 +1,3 @@
-/*
-FILE *inputfile;
-            char tempWord[BUFFER];
-            inputfile = fopen(w[i].path, "r")
-*/
 #include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
