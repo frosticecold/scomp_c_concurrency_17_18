@@ -17,7 +17,7 @@ int main()
     sem_t *semaphore[NUM_PROCESSES];
     int i = 0;
     char name[NUM_PROCESSES][BUFFER];
-    
+
     for (; i < NUM_PROCESSES; i++)
     {
         sprintf(name[i], "sem%d", i);
@@ -26,7 +26,7 @@ int main()
     for (i = 0; i < NUM_PROCESSES; i++)
     {
         semaphore[i] = sem_open(name[i], O_CREAT | O_EXCL, 0644, 0);
-        if (semaphore[i]  == SEM_FAILED)
+        if (semaphore[i] == SEM_FAILED)
         {
             perror("Can't sem_open()");
             exit(1);
@@ -112,7 +112,7 @@ int main()
     }
     printf("\n");
 
-     for (i = 0; i < NUM_PROCESSES; i++)
+    for (i = 0; i < NUM_PROCESSES; i++)
     {
         if (sem_unlink(name[i]) == -1)
         {
@@ -120,6 +120,6 @@ int main()
             return 1;
         }
     }
-   
+
     return 0;
 }
