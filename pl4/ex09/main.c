@@ -8,29 +8,18 @@
 #define SEM_NAME_BEER "semaphore_beer_ex9"
 #define SEM_NAME_CHIPS "semaphore_chips_ex9"
 
-int buyingBeer()
+void buyingBeer()
 {
-    int beer = 0;
-    int i = 0;
-    for (; i < 100; i++)
-    {
-        ++beer;
-        //buying chips
-    }
-    return beer;
+    sleep(1);
+    //buying beer
 }
 
-int buyingChips()
+void buyingChips()
 {
-    int chips = 0;
-    int i = 0;
-    for (; i < 100; i++)
-    {
-        ++chips;
-        //buying chips
-    }
-    return chips;
+    sleep(1);
+    //buying chips
 }
+
 int main()
 {
     pid_t pid;
