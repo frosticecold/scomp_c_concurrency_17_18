@@ -82,26 +82,6 @@ int main()
     Train *t;
     int travel = 0;
 
-    if (shm_unlink("/semaphore11") == -1)
-    { //shm_unlink de memoria para remoção de ficheiro de memoria parilhada com verificação de erro
-        perror("Erro unlink\n");
-    }
-
-    if (sem_unlink(SEM_PORTA1) == -1)
-    {
-        perror("Error unlink porta 1");
-    }
-
-    if (sem_unlink(SEM_PORTA2) == -1)
-    {
-        perror("Error unlink porta 2");
-    }
-
-    if (sem_unlink(SEM_PORTA3) == -1)
-    {
-        perror("Error unlink porta 3");
-    }
-
     fd = shm_open("/semaphore11", O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR); //criação de ficheiro de memoria partilhada para escrita
     if (fd == -1)                                                                // verificação de criação de ficheiro de memoria partilhada para escrita
     {
