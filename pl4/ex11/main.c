@@ -11,8 +11,6 @@
 #define SEM_PORTA1 "sem_porta1"
 #define SEM_PORTA2 "sem_porta2"
 #define SEM_PORTA3 "sem_porta3"
-#define SEM_FULL "sem_full"
-#define SEM_EMPTY "sem_empty"
 #define NUMBER_OF_TRIPS 5
 #define NUM_PROCESSES 3
 #define MAX_PEOPLE 200
@@ -32,10 +30,9 @@ int peopleGenerator(int ammount)
     return people;
 }
 
-void peopleEntering(sem_t *full, sem_t *empty, Train *t)
+void peopleEntering(Train *t)
 {
     int numberOfPeople;
-    int i = 0;
     if (t->is_empty == 0) //is empty
     {
         numberOfPeople = peopleGenerator(MAX_PEOPLE); //ammount of people exiting the train
@@ -51,17 +48,11 @@ void peopleEntering(sem_t *full, sem_t *empty, Train *t)
     }
     printf("Entering the train: %d people\n", numberOfPeople);
     sleep(1);
-    for (; i < numberOfPeople; i++)
-    {
-        sem_post(full);
-        sem_wait(empty);
-    }
 }
 
-void peopleExiting(sem_t *full, sem_t *empty, Train *t)
+void peopleExiting(Train *t)
 {
     int numberOfPeople;
-    int i = 0;
     if (t->is_empty == 1) //not empty
     {
         numberOfPeople = peopleGenerator(t->seats_occupied); //ammount of people exiting the train
@@ -78,11 +69,6 @@ void peopleExiting(sem_t *full, sem_t *empty, Train *t)
     }
     printf("Exiting the train: %d people\n", numberOfPeople);
     sleep(1);
-    for (; i < numberOfPeople; i++)
-    {
-        sem_wait(full);
-        sem_post(empty);
-    }
 }
 
 int main()
@@ -91,12 +77,30 @@ int main()
     sem_t *sem_porta1;
     sem_t *sem_porta2;
     sem_t *sem_porta3;
-    sem_t *sem_empty;
-    sem_t *sem_full;
 
     int fd, data_size = sizeof(Train);
     Train *t;
     int travel = 0;
+
+    if (shm_unlink("/semaphore11") == -1)
+    { //shm_unlink de memoria para remoção de ficheiro de memoria parilhada com verificação de erro
+        perror("Erro unlink\n");
+    }
+
+    if (sem_unlink(SEM_PORTA1) == -1)
+    {
+        perror("Error unlink porta 1");
+    }
+
+    if (sem_unlink(SEM_PORTA2) == -1)
+    {
+        perror("Error unlink porta 2");
+    }
+
+    if (sem_unlink(SEM_PORTA3) == -1)
+    {
+        perror("Error unlink porta 3");
+    }
 
     fd = shm_open("/semaphore11", O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR); //criação de ficheiro de memoria partilhada para escrita
     if (fd == -1)                                                                // verificação de criação de ficheiro de memoria partilhada para escrita
@@ -143,20 +147,6 @@ int main()
         perror("Can't sem_open() child\n");
     }
 
-    sem_empty = sem_open(SEM_EMPTY, O_CREAT | O_EXCL, 0644, 200);
-    //value 200 so that
-    if (sem_empty == SEM_FAILED)
-    {
-        perror("Can't sem_open() child\n");
-    }
-
-    sem_full = sem_open(SEM_FULL, O_CREAT | O_EXCL, 0644, 0);
-    //value 0 so that the parent can control the flow of the execution
-    if (sem_full == SEM_FAILED)
-    {
-        perror("Can't sem_open() child\n");
-    }
-
     /*==============================================================*/
 
     /*======================= TRAVEL PROCESS =======================*/
@@ -173,17 +163,17 @@ int main()
         { //exiting the train
             sem_wait(sem_porta1);
             printf("Exiting door 1\n");
-            peopleExiting(sem_full, sem_empty, t);
+            peopleExiting(t);
             sem_post(sem_porta1);
 
             sem_wait(sem_porta2);
             printf("Exiting door 2\n");
-            peopleExiting(sem_full, sem_empty, t);
+            peopleExiting(t);
             sem_post(sem_porta2);
 
             sem_wait(sem_porta3);
             printf("Exiting door 3\n");
-            peopleExiting(sem_full, sem_empty, t);
+            peopleExiting(t);
 
             sem_post(sem_porta3);
 
@@ -194,17 +184,17 @@ int main()
 
             sem_wait(sem_porta1);
             printf("Entering door 1\n");
-            peopleEntering(sem_full, sem_empty, t);
+            peopleEntering(t);
             sem_post(sem_porta1);
 
             sem_wait(sem_porta2);
             printf("Entering door 2\n");
-            peopleEntering(sem_full, sem_empty, t);
+            peopleEntering(t);
             sem_post(sem_porta2);
 
             sem_wait(sem_porta3);
             printf("Entering door 3\n");
-            peopleEntering(sem_full, sem_empty, t);
+            peopleEntering(t);
             sem_post(sem_porta3);
         }
     }
@@ -212,15 +202,6 @@ int main()
     /*==============================================================*/
 
     /*==================== UNLINKING SEMAPHORES ====================*/
-    if (sem_unlink(SEM_EMPTY) == -1)
-    {
-        perror("Error unlink empty");
-    }
-
-    if (sem_unlink(SEM_FULL) == -1)
-    {
-        perror("Error unlink full");
-    }
 
     if (sem_unlink(SEM_PORTA1) == -1)
     {
