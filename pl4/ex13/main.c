@@ -24,7 +24,6 @@ typedef struct
     int rnd_num;
 } shared_memory;
 
-
 int main()
 {
     /*==================== INITIALIZE VARIABLES ====================*/
@@ -60,7 +59,7 @@ int main()
     srand(time(NULL));
     addr->producer_index = 0;
     addr->consumer_index = 0;
-    addr->rnd_num = rand()%BUFFER;
+    addr->rnd_num = rand() % BUFFER;
 
     /*==============================================================*/
 
@@ -104,17 +103,20 @@ int main()
 
     if (pid > 0)
     { /*FATHER ------ CONSUMER*/
-
         int index = 0;
         do
         {
-            if (addr->consumer_index == SIZE - 1) //check if it consumed all the buffer
+            if (addr->consumer_index == (addr->producer_index - 1) || (addr->consumer_index == (SIZE - 1) && addr->producer_index == 0)) //check if it consumed all the buffer
             {
-                sem_post(balance);        // if yes then gives time to the producer
-                addr->consumer_index = 0; //restart the index for the producer
+                sem_post(balance); // if yes then gives time to the producer
             }
+            
             sem_wait(sem_full); //notifies its going to consume
             sem_wait(mutex);    //create exclusive access to the critical code
+            if (addr->consumer_index == SIZE - 1)
+            {
+                addr->consumer_index = 0;
+            }
             printf("Consumer --- Counter[%d] Number:%d\n", index, addr->buffer[addr->consumer_index]);
             addr->consumer_index++;
             index++;
@@ -129,18 +131,23 @@ int main()
         int index = 0;
         do
         {
-            if (addr->producer_index == SIZE - 1) //check if it produced all the buffer
+            
+            if (addr->producer_index == (addr->consumer_index - 1) || (addr->producer_index == (SIZE - 1) && addr->consumer_index == 0)) //check if it produced all the buffer
             {
                 sem_wait(balance); //if so gives time to the producer to catch up blocking the semaphore
-                addr->producer_index = 0;
             }
             sem_wait(sem_empty);                                //tells the process is going to produce
             sem_wait(mutex);                                    //creates exclusive access to the shared memory
+            if (addr->producer_index == SIZE - 1)
+            {
+                addr->producer_index = 0;
+            }
             addr->buffer[addr->producer_index] = addr->rnd_num; // assigns the buffer the random number
             addr->rnd_num++;                                    //increments the random number
             printf("Producer --- Counter[%d] Number:%d\n", index, addr->buffer[addr->producer_index]);
             addr->producer_index++;
             index++;
+            
             sem_post(mutex);    //noticies other processes it finished the critical code
             sem_post(sem_full); //noticies the end of the production
         } while (iteration--);
