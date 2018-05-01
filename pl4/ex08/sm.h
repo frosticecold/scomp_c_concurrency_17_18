@@ -9,7 +9,7 @@
 #include <stdio.h>  //perror
 #include <string.h> //memset
 
-#define SHM_FILENAME "/pl4_ex07"
+#define SHM_FILENAME "/pl4_ex08"
 #define SHM_DELETE "/dev/shm" SHM_FILENAME
 
 /** shared memory struct */

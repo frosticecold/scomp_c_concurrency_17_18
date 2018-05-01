@@ -10,7 +10,7 @@
 #include "shared_data.h"
 #include <time.h>
 
-#define MAX_TIME 5
+#define MAX_TIME 10
 int main()
 {
     /** shared variables */

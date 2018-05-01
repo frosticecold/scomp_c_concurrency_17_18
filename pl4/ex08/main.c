@@ -48,7 +48,7 @@ int main()
                 addr->numC = 0;
             }
             sem_post(sem);
-            sleep(rand() % 5);
+            //sleep(rand() % 5);
         }
         exit(0);
     }
@@ -69,7 +69,7 @@ int main()
                 addr->numS = 0;
             }
             sem_post(sem);
-            sleep(rand() % 5);
+            //sleep(rand() % 5);
         }
     }
     delete_shared_memory(addr);
