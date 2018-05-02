@@ -45,6 +45,39 @@ int main()
     sem_t *sem_normal;
     Theater *t;
 
+    /*ESTE EXERCICIO FUNCIONA EM LOOP INFINITO SE PRECISAR DE UNLINK 
+    LIMPAR A MEMORIA OU SEMAFORO DESOMENTAR O CODIGO SEGUINTE...*/
+    /*
+    if (shm_unlink(SHAREDMEMORY_NAME) == -1)
+    { //shm_unlink de memoria para remoção de ficheiro de memoria parilhada com verificação de erro
+        perror("Erro unlink\n");
+    }
+
+    if (sem_unlink(SEM_NAME_EMPTY) == -1)
+    {
+        perror("Error unlink sem_empty\n");
+    }
+
+    if (sem_unlink(SEM_NAME_FULL) == -1)
+    {
+        perror("Error unlink sem_full\n");
+    }
+
+    if (sem_unlink(SEM_NAME_NORMAL) == -1)
+    {
+        perror("Error unlink sem_empty\n");
+    }
+
+    if (sem_unlink(SEM_NAME_SPECIAL) == -1)
+    {
+        perror("Error unlink sem_full\n");
+    }
+
+    if (sem_unlink(SEM_NAME_VIP) == -1)
+    {
+        perror("Error unlink sem_full\n");
+    }
+    */
     int fd, data_size = sizeof(Theater);
 
     fd = shm_open(SHAREDMEMORY_NAME, O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR); //criação de ficheiro de memoria partilhada para escrita
@@ -118,28 +151,36 @@ int main()
         int total_people;
         while (1)
         {
-            sem_getvalue(sem_full, &total_people); // check if its full
+            sem_getvalue(sem_empty, &total_people); // check if its full
             if (total_people == SIZE)
             {
                 printf("Theater is FULL, Someone exits...\n");
                 sleep(2);
+                /*SOMEONE ES LEAVING THE ROOM*/
                 sem_wait(sem_full);
                 sem_post(sem_empty);
+                /*IF SOMEONE IS IN LINE THE SIGNALS IT CAN ENTER*/
                 if (t->vip_clients > 0)
                 {
                     printf("VIP client can enter\n");
-                    sem_post(sem_vip);
+                    sem_post(sem_vip); //signal the vip client can enter, someone has left the room
                 }
-                else if (t->special_clients > 0)
+                if (t->special_clients > 0)
                 {
                     printf("SPECIAL client can enter\n");
-                    sem_post(sem_special);
+                    sem_post(sem_special); //signal the special client can enter, someone has left the room
                 }
-                else
+                if(t->normal_clients>0)
                 {
-                    printf("NORMAL client can enter\n");            
-                    sem_post(sem_normal);
+                    printf("NORMAL client can enter\n");
+                    sem_post(sem_normal); //signal the normal client can enter, someone has left the room
                 }
+                /*==============================================*/
+            }
+            else
+            {
+                sem_wait(sem_full);
+                sem_post(sem_empty);
             }
         }
         /*===============================*/
@@ -159,35 +200,39 @@ int main()
                     printf("Theater full , VIP client Waiting\n");
                     t->vip_clients++;
                     sleep(1);
-                    sem_wait(sem_vip);
+                    sem_wait(sem_vip); // vip client has to wait for its turn
                     t->vip_clients--;
                     printf("Theater is now free , VIP client has entered!\n");
                     sleep(1);
                 }
-                else if (client_status == SPECIAL)
+                if (client_status == SPECIAL)
                 {
                     printf("Theater full , SPECIAL client Waiting\n");
                     t->special_clients++;
                     sleep(1);
-                    sem_wait(sem_special);
+                    sem_wait(sem_special); // special client has to wait for its turn
                     t->special_clients--;
                     printf("Theater is now free , SPECIAL client has entered!\n");
                     sleep(1);
                 }
-                else
+                if (client_status == NORMAL)
                 {
                     printf("Theater full , NORMAL client Waiting\n");
                     t->normal_clients++;
                     sleep(1);
-                    sem_wait(sem_normal);
+                    sem_wait(sem_normal); // normal client has to wait for its turn
                     t->normal_clients--;
                     printf("Theater is now free , NORMAL client has entered!\n");
                     sleep(1);
                 }
+                sem_wait(sem_empty);
+                sem_post(sem_full);
             }
-            sem_wait(sem_empty);
-            sem_post(sem_full);
-            //check if its full
+            else
+            {
+                sem_wait(sem_empty);
+                sem_post(sem_full);
+            }
         }
         exit(0);
     }
