@@ -77,7 +77,7 @@ int main()
         perror("Can't sem_open() sem_full\n");
     }
 
-    sem_empty = sem_open(SEM_NAME_EMPTY, O_CREAT | O_EXCL, 0644, 30);
+    sem_empty = sem_open(SEM_NAME_EMPTY, O_CREAT | O_EXCL, 0644, 10);
     //value_empty 30 for mutual exclusion so it will block after the process
     if (sem_empty == SEM_FAILED)
     {
@@ -106,11 +106,10 @@ int main()
         int index = 0;
         do
         {
-            if (addr->consumer_index == (addr->producer_index - 1) || (addr->consumer_index == (SIZE - 1) && addr->producer_index == 0)) //check if it consumed all the buffer
+            if (addr->consumer_index == (addr->producer_index - 1) || (addr->consumer_index == (SIZE - 1) && addr->producer_index == 0)) //confirms that doesnt go over the producer
             {
                 sem_post(balance); // if yes then gives time to the producer
             }
-            
             sem_wait(sem_full); //notifies its going to consume
             sem_wait(mutex);    //create exclusive access to the critical code
             if (addr->consumer_index == SIZE - 1)
@@ -132,7 +131,7 @@ int main()
         do
         {
             
-            if (addr->producer_index == (addr->consumer_index - 1) || (addr->producer_index == (SIZE - 1) && addr->consumer_index == 0)) //check if it produced all the buffer
+            if (addr->producer_index == (addr->consumer_index - 1) || (addr->producer_index == (SIZE - 1) && addr->consumer_index == 0)) //confirms that doesnt go over the consumer 
             {
                 sem_wait(balance); //if so gives time to the producer to catch up blocking the semaphore
             }
