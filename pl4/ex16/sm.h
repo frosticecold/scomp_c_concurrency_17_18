@@ -8,18 +8,15 @@
 #include <sys/stat.h>
 #include <stdio.h>  //perror
 #include <string.h> //memset
-#define SHM_FILENAME "/pl4_ex12"
+#define SHM_FILENAME "/pl4_ex16"
 #define SHM_DELETE "/dev/shm" SHM_FILENAME
 #define SHM_DEFAULT_FLAGS O_CREAT | O_RDWR
-#define MAX_CLIENTS 30
-
 /** shared memory struct */
 typedef struct
 {
     int fd;
-    int numClientes;
-    int bilhetes[MAX_CLIENTS];
-    int nr_bilhete;
+   int num_cars_east;
+   int num_cars_west;
 } shared_memory;
 
 shared_memory *create_shared_memory(int flags);

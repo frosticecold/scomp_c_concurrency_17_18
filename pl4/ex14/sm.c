@@ -1,9 +1,9 @@
 #include "sm.h"
-shared_memory *create_shared_memory(void)
+shared_memory *create_shared_memory(int flags)
 {
     int fd;
     const char *const workingdir = SHM_FILENAME;
-    int flags = O_CREAT | O_EXCL | O_RDWR;
+    //int flags = O_CREAT | O_EXCL | O_RDWR;
     mode_t mode = S_IRUSR | S_IWUSR;
     fd = shm_open(workingdir, flags, mode);
     if (fd == -1)
@@ -17,7 +17,8 @@ shared_memory *create_shared_memory(void)
         return NULL;
     }
     int prot_flags = PROT_READ | PROT_WRITE;
-    shared_memory *addr = mmap(NULL, sizeof(shared_memory), prot_flags, MAP_SHARED, fd, 0);
+    shared_memory *addr = mmap(NULL, sizeof(shared_memory)
+    , prot_flags, MAP_SHARED, fd, 0);
     if (addr == MAP_FAILED)
     {
         perror("Erro ao fazer map à memória.");
