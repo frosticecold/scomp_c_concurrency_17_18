@@ -4,131 +4,61 @@
 #include <string.h>
 #include "sm.h"
 #include <time.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 
-#define SEM_EMPTY "/EMPTY"
-#define SEM_FULL "/FULL"
-#define SEM_INDEX "/INDEX_ACCESS"
-#define CIRCULAR_BUFF_SIZE 300
+#define INDEX_NAME "SEM_INDEX"
+#define MAX_TIME 5
 shared_memory *addr;
-sem_t *empty, *full, *index_access;
+sem_t *index_access;
 
-void rmv_str_shm(shared_memory *addr);
 int main()
 {
-    sem_unlink(SEM_EMPTY);
-    sem_unlink(SEM_FULL);
-    sem_unlink(SEM_INDEX);
-    check_if_shm_exists();
-    const char *MSG = "I'm the Father - with PID ";
-    const int n = 5; /* Number of processes  */
-    pid_t pid[n];    /* Vector of processes  */
-    int i;           /* loop variable        */
+    srand(time(NULL));
 
     addr = create_shared_memory();
+    if (addr == NULL)
+        return 1;
 
-    sem_unlink(SEM_EMPTY);
-    /* criar semaforo com 50 posicoes */
-    if ((empty = sem_open(SEM_EMPTY, O_CREAT | O_EXCL, 0644, NUM_OF_STRIGS)) == SEM_FAILED)
+    if ((index_access = sem_open(INDEX_NAME, O_CREAT, 0644, 1)) == SEM_FAILED)
     {
-        perror("Can't sem_open() SEM_EMPTY");
+        perror("Can't sem_open()");
         exit(1);
     }
 
-    if ((full = sem_open(SEM_FULL, O_CREAT | O_EXCL, 0644, 0)) == SEM_FAILED)
+    struct timespec st;
+    st.tv_sec = 12;
+    st.tv_nsec = 0;
+    int r = sem_timedwait(index_access,&st);
+    if (r == -1)
     {
-        perror("Can't sem_open() SEM_FULL");
+        printf("Error sem_wait\n");
         exit(1);
     }
-
-    if ((index_access = sem_open(SEM_INDEX, O_CREAT | O_EXCL, 0644, 1)) == SEM_FAILED)
+    if (r == ETIMEDOUT)
     {
-        perror("Can't sem_open() SEM_INDEX");
+        printf("PID:%d timedout", getpid());
         exit(1);
     }
-    for (i = 0; i < n; i++)
+    if (addr->index > 0)
     {
-        pid[i] = fork();
-        if (pid[i] == -1)
-        {
-            perror("Error forking.");
-            exit(1);
-        }
-        if (pid[i] == 0)
-        {
-            break;
-        }
+        addr->index--;
+        printf("Deleting: %s\nCurrent PID:%d\n", addr->str[addr->index],getpid());
+        strcpy(addr->str[addr->index], "REMOVED THIS LINE");
+        sleep(rand() % MAX_TIME);
+        sem_post(index_access);
     }
-
-    if (i == n)
-        i = 0;
-    /**
-     * Child code
-     * */
-    if (pid[i] == 0)
-    {
-        struct timespec twait;
-        twait.tv_sec = 12;
-        twait.tv_nsec = 0;
-        srand(time(NULL));
-        int keeprunning = 1;
-        do
-        {
-            int ret = sem_timedwait(empty, &twait);
-            if (ret != -1)
-            {
-                sem_wait(index_access);
-                int idx = addr->index;
-                addr->index++;
-                sem_post(index_access);
-                if (idx < CIRCULAR_BUFF_SIZE)
-                {
-                    sprintf(addr->str[(idx)%NUM_OF_STRIGS], "%s %d\n", MSG, getpid());
-                    idx=(idx+1);
-                }
-                if (idx >= CIRCULAR_BUFF_SIZE)
-                    keeprunning = 0;
-            }
-            else
-            {
-                printf("Warning: %d timedout.\n", getpid());
-            }
-
-            sem_post(full);
-            int rnd = (rand() % 3) + 1;
-            sleep(1);
-        } while (keeprunning);
-        exit(0);
-    }
-    /**
-     * Fathers Code
-     * */
     else
     {
-        int read_index = 0;
-
-        for (i = 0; i < CIRCULAR_BUFF_SIZE; ++i)
-        {
-            sem_wait(full);
-            printf("[%d] %s\n", i, addr->str[read_index]);
-            sem_post(empty);
-            read_index++;
-            if (read_index == NUM_OF_STRIGS)
-                read_index = 0;
-
-        }
+        printf("Can't delete more...\n");
+        sem_post(index_access);
     }
-    delete_shared_memory(addr);
-    sem_unlink(SEM_EMPTY);
-    sem_unlink(SEM_FULL);
-    sem_unlink(SEM_INDEX);
+
+    //delete_shared_memory(addr);
+    //sem_unlink(SEM_NAME);
     return 0;
-}
-void rmv_str_shm(shared_memory *addr)
-{
-    int idx;
-    if (addr->index == NUM_OF_STRIGS)
-        idx = addr->index - 1;
-    printf("Removing %d line\n %s\n", idx, addr->str[idx]);
-    strcpy(addr->str[idx], "");
-    addr->index--;
 }

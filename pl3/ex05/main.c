@@ -106,4 +106,9 @@ int main()
     }
 
     return 0;
+
+    /**
+     *  Se o número de processos for igual ao número de cores disponíveis,
+     * é a melhor performance existente
+    **/
 }
