@@ -180,6 +180,9 @@ shared_data_type *create_shared_memory(void)
     }
     return addr;
 }
+/*
+    Delete shared memory
+*/
 void delete_shared_memory(shared_data_type *addr)
 {
     munmap(addr, sizeof(shared_data_type));

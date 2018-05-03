@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <stdio.h>  //perror
+#include <stdio.h> //perror
 #include <string.h> //memset
 #define STR_SIZE 80
 #define NUM_OF_STRIGS 50

@@ -3,7 +3,7 @@ shared_memory *create_shared_memory(void)
 {
     int fd;
     const char *const workingdir = SHM_FILENAME;
-    int flags = O_CREAT | O_EXCL | O_RDWR;
+    int flags = O_CREAT | O_RDWR;
     mode_t mode = S_IRUSR | S_IWUSR;
     fd = shm_open(workingdir, flags, mode);
     if (fd == -1)
@@ -23,7 +23,7 @@ shared_memory *create_shared_memory(void)
         perror("Erro ao fazer map à memória.");
         return NULL;
     }
-    memset(&addr[0], 0, sizeof(shared_memory));
+    //memset(&addr[0], 0, sizeof(shared_memory));
     addr->fd = fd;
     return addr;
 }

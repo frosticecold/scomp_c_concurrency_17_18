@@ -6,80 +6,82 @@
 #include <fcntl.h>
 #include "sm.h"
 #include <sys/wait.h>
+#include <time.h>
 
-sem_t *sem;
-shared_memory *addr;
-#define SEM_NAME "sem_ex08"
+sem_t *sem_empty, *sem_full;
+#define SEM_EMPTY "sem_empty"
+#define SEM_FULL "sem_full"
 void open_sem();
 int main()
 {
-    sem_unlink(SEM_NAME);
-    check_if_shm_exists();
+    sem_unlink(SEM_EMPTY);
+    sem_unlink(SEM_FULL);
     open_sem();
-    addr = create_shared_memory();
+    pid_t pid;
 
-    const int np = 1; /* number of processes */
-    int i;
-    pid_t pid[np];
-    for (i = 0; i < np; ++i)
+    if ((pid = fork()) == -1)
     {
-        if ((pid[i] = fork()) == -1)
-        {
-            perror("Error forking.");
-            exit(0);
-        }
+        perror("Error forking.");
+        exit(0);
     }
-    if (i == np)
-        i = 0;
-    /*Child code*/
-    if (pid[i] == 0)
+
+    /*Child code print S*/
+    if (pid == 0)
     {
-        srand(time(NULL) * getpid());
+        int r;
         while (1)
         {
-            sem_wait(sem);
-            if (addr->numS < 2)
+            r = sem_wait(sem_empty);
+            if (r == -1)
             {
-                printf("S\n");
-                addr->numS++;
+                perror("Error sem_wait(sem_empty)");
+                exit(1);
             }
-            if (addr->numC >= 2)
+            fflush(stdout);
+            printf("S");
+            r = sem_post(sem_full);
+            if (r == -1)
             {
-                addr->numC = 0;
+                perror("Error sem_post(sem_full)");
+                exit(1);
             }
-            sem_post(sem);
-            //sleep(rand() % 5);
         }
         exit(0);
     }
     /* Father code */
     else
     {
-        srand(time(NULL) * getpid());
+        int r;
         while (1)
         {
-            sem_wait(sem);
-            if (addr->numC < 2)
+            r = sem_wait(sem_full);
+            if (r == -1)
             {
-                printf("C\n");
-                addr->numC++;
+                perror("Error sem_wait(sem_full)");
+                exit(1);
             }
-            if (addr->numS >= 2)
+            fflush(stdout);
+            printf("C");
+            r = sem_post(sem_empty);
+            if (r == -1)
             {
-                addr->numS = 0;
+                perror("Error sem_post(sem_empty)");
+                exit(1);
             }
-            sem_post(sem);
-            //sleep(rand() % 5);
         }
     }
-    delete_shared_memory(addr);
-    sem_unlink(SEM_NAME);
+    sem_unlink(SEM_EMPTY);
     return 0;
 }
 
 void open_sem()
 {
-    if ((sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0644, 1)) == SEM_FAILED)
+    if ((sem_empty = sem_open(SEM_EMPTY, O_CREAT | O_EXCL, 0644, 2)) == SEM_FAILED)
+    {
+        perror("No sem_open()");
+        exit(1);
+    }
+    if ((sem_full = sem_open(SEM_FULL, O_CREAT | O_EXCL, 0644, 0)) == SEM_FAILED)
     {
         perror("No sem_open()");
         exit(1);

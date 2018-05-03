@@ -3,77 +3,66 @@
 #include <sys/wait.h>
 #include <string.h>
 #include "sm.h"
+#include <time.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
+#define SEM_NAME "semaforo"
+#define INDEX_NAME "SEM_INDEX"
+#define MAX_TIME 5
 shared_memory *addr;
 sem_t *semaphore;
+sem_t *index_access;
+
 int main()
 {
-    check_if_shm_exists();
+    srand(time(NULL));
+    //check_if_shm_exists();
     const char *MSG = "I'm the Father - with PID ";
 
     addr = create_shared_memory();
+    if (addr == NULL)
+        return 1;
 
-    sem_unlink("semaforo");
-    if ((semaphore = sem_open("semaforo", O_CREAT | O_EXCL, 0644, 1)) == SEM_FAILED)
+    //sem_unlink(SEM_NAME);
+    if ((semaphore = sem_open(SEM_NAME, O_CREAT, 0644, 1)) == SEM_FAILED)
     {
         perror("Can't sem_open()");
         exit(1);
     }
 
-    const int n = 10;
-    pid_t pid[n];
-    int i;
-    for (i = 0; i < n; i++)
+    if ((index_access = sem_open(INDEX_NAME, O_CREAT, 0644, 1)) == SEM_FAILED)
     {
-        pid[i] = fork();
-        if (pid[i] == -1)
-        {
-            perror("Error forking.");
-            exit(1);
-        }
-        if (pid[i] == 0)
-        {
-            break;
-        }
+        perror("Can't sem_open()");
+        exit(1);
     }
 
-    if (i == n)
-        i = 0;
-    /**
-     * Child code
-     * */
-    if (pid[i] == 0)
+    char buffer[50];
+    int r = sem_wait(index_access);
+    if (r == -1)
     {
-        while (addr->index < NUM_OF_STRIGS)
-        {
-            sem_wait(semaphore);
-            int idx = addr->index;
-            if (idx < NUM_OF_STRIGS)
-            {
-                sprintf(addr->str[idx], "%s %d\n", MSG, getpid());
-                addr->index++;
-            }
-            sem_post(semaphore);
-            int rnd = (rand() % 5) + 1;
-            sleep(rnd);
-        }
-        exit(0);
+        perror("Error sem_wait(index_access)");
+        exit(1);
     }
-    /**
-     * Fathers Code
-     * */
     else
     {
-        for (i = 0; i < n; ++i)
+        sprintf(buffer, "%s %d [%d]", MSG, getpid(), addr->index);
+        strcpy(addr->str[addr->index], buffer);
+        addr->index++;
+        sleep(rand() % MAX_TIME);
+        r = sem_post(index_access);
+        if (r == -1)
         {
-            waitpid(pid[i], NULL, 0);
+            perror("Error sem_post(index_access)");
+            exit(1);
         }
-        for (i = 0; i < NUM_OF_STRIGS; ++i)
-        {
-            printf("[%d] %s", i, addr->str[i]);
-        }
+        printf("%s\n", buffer);
     }
-    delete_shared_memory(addr);
-    sem_unlink(semaphore);
+
+    //delete_shared_memory(addr);
+    //sem_unlink(SEM_NAME);
     return 0;
 }

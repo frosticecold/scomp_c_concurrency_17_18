@@ -86,7 +86,7 @@ int *create_shared_memory(void)
 }
 void delete_shared_memory(int *addr)
 {
-    if (munmap(addr, sizeof(int)) == MAP_FAILED)
+    if (munmap(addr, sizeof(int)) == -1)
     {
         perror("Erro ao fazer map unmapping");
         return;
