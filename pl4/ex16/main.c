@@ -69,12 +69,15 @@ int main()
             printf("GIVE TURN TO WEST\n");
 
             sem_post(bridge);
-            sem_post(directionWEST);
+            
             sleep(1);
+            sem_post(directionWEST);
             sem_wait(directionEAST);
             if (addr->num_cars_east == 0)
             {
+                
                 printf("The cars from East side had all crossed\n");
+                sem_post(directionWEST);
                 break;
             }
         }
@@ -117,11 +120,13 @@ int main()
             printf("GIVE TURN TO EAST\n");
 
             sem_post(bridge);
-            sem_post(directionEAST);
+            
             sleep(1);
+            sem_post(directionEAST);
             sem_wait(directionWEST);
             if (addr->num_cars_west == 0)
             {
+                sem_post(directionEAST);
                 printf("The cars from West side had all crossed\n");
                 break;
             }
