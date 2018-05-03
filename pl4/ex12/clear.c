@@ -10,19 +10,22 @@
 
 int main()
 {
-    sem_close(full);
-    sem_close(empty);
-    sem_close(semcliente);
-    sem_close(sembilhetes);
+    sem_unlink(SEM_FULL);
+    sem_unlink(SEM_EMPTY);
+    sem_unlink(SEM_VEC_NAME);
+    sem_unlink(SEM_INDICE);
+
     int i;
     for (i = 0; i < MAX_CLIENTS; i++)
     {
-        sem_close(sem_vec[i]);
+        char str[32];
+        sprintf(str, "%s %d", SEM_VEC_NAME, i);
+        sem_unlink(str);
     }
     unlink(SHM_DELETE);
 
     addr = create_shared_memory(O_CREAT | O_RDWR);
-    memset(addr,0,sizeof(shared_memory));
+    memset(addr, 0, sizeof(shared_memory));
     open_semaphores();
 
     return 0;
