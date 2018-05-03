@@ -2,7 +2,7 @@
 INCLUDES =
 SOURCES =
 OBJFILES =
-EXEC = reader writer
+EXEC = reader writer clear
 FLAGS = -Wall -g
 LIBS =  -lrt -lpthread
 
@@ -14,6 +14,8 @@ reader: sm.c shared_data.c reader.c
 writer: sm.c shared_data.c writer.c
 	gcc $(FLAGS) -o writer $? $(LIBS)
 
+clear: sm.c shared_data.c clear.c
+	gcc $(FLAGS) -o clear $? $(LIBS)
 clean:
 	rm -f ${OBJFILES} ${EXEC}
 
