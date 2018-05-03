@@ -14,7 +14,7 @@
 /** shared memory struct */
 typedef struct
 {
-    int fd;
+   int fd;
    int num_cars_east;
    int num_cars_west;
 } shared_memory;
