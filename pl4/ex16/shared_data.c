@@ -11,13 +11,13 @@
 void open_semaphores()
 {
 
-    bridge = sem_open(SEM_BRIDGE, O_CREAT, 0644, SEM_MUTEX);
+    bridge = sem_open(SEM_BRIDGE, O_CREAT, 0644, 1);
     if (bridge == SEM_FAILED)
     {
         perror("sem_z  sem_open()");
         exit(1);
     }
-    directionEAST = sem_open(SEM_DIRECTIONEAST, O_CREAT, 0644, 1);
+    directionEAST = sem_open(SEM_DIRECTIONEAST, O_CREAT, 0644, 0);
     if (directionEAST == SEM_FAILED)
     {
         perror("direction  sem_open()");
