@@ -15,7 +15,7 @@
 #define NUM_PER_THREAD ARRAY_SIZE / THREAD_SIZE
 
 int keys[ARRAY_SIZE][KEY_SIZE];
-int statistics[TOTAL_NUM][1];
+int statistics[TOTAL_NUM];
 int total = 0;
 
 pthread_mutex_t mutex[THREAD_SIZE];
@@ -52,7 +52,7 @@ void *thread_func(void *args)
         for (j = 0; j < KEY_SIZE; j++)
         {
             int statistics_pos = keys[begin][j] - 1;
-            statistics[statistics_pos][0]++;
+            statistics[statistics_pos]++;
             total++;
         }
     }
@@ -70,23 +70,23 @@ void function_initialize()
     int i = 0;
     for (i = 0; i < THREAD_SIZE; i++)
     {
-        pthread_mutex_init(&mutex[i], NULL);
-        /*if ( != 0)
+
+        if (pthread_mutex_init(&mutex[i], NULL) != 0)
         {
             perror("Error mutex creation\n");
         }
         if (i > 0)
         {
-            pthread_mutex_lock(&mutex[i]);
-            /*if ( != 0)
+
+            if (pthread_mutex_lock(&mutex[i]) != 0)
             {
                 perror("error locking mutex\n");
-            }*/
-        // }
+            }
+        }
     }
     for (i = 0; i < TOTAL_NUM; i++)
     { //intialize the statistics counter
-        statistics[i][0] = 0;
+        statistics[i] = 0;
     }
 }
 
@@ -118,11 +118,11 @@ int main()
         }
     }
     /*====Threads terminated===================*/
-    int temp =0;
+    int temp = 0;
     for (i = 0; i < TOTAL_NUM; i++)
     {
-        temp+=statistics[i][0];
-        printf("Number: %d --- Times: %d\n", i + 1, statistics[i][0]);
+        temp += statistics[i];
+        printf("Number: %d --- Times: %d\n", i + 1, statistics[i]);
     }
     printf("Total %d\n", total);
 
