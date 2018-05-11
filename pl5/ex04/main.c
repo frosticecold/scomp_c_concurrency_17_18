@@ -27,6 +27,7 @@ void *fill_matrix_thread(void *args);
 void print_matrix(int **matrix, int lines, int columns);
 void *multiply_matrices(void *args);
 void empty_matrix(matrices *tm);
+void freematrix(matrices *mt);
 int main()
 {
 
@@ -36,13 +37,29 @@ int main()
     tm.matrix1 = creatematrix(LINES, COLUMNS);
     tm.matrix2 = creatematrix(LINES, COLUMNS);
     tm.result = creatematrix(LINES, COLUMNS);
-    pthread_create(&fill1, NULL, fill_matrix_thread, &tm.matrix1);
-    pthread_create(&fill2, NULL, fill_matrix_thread, &tm.matrix2);
+    if (pthread_create(&fill1, NULL, fill_matrix_thread, &tm.matrix1) != 0)
+    {
+        perror("Erro thread fill matrix1.");
+        exit(1);
+    }
+    if (pthread_create(&fill2, NULL, fill_matrix_thread, &tm.matrix2) != 0)
+    {
+        perror("Erro thread fill matrix1.");
+        exit(1);
+    }
 
     empty_matrix(&tm);
 
-    pthread_join(fill1, NULL);
-    pthread_join(fill2, NULL);
+    if (pthread_join(fill1, NULL) != 0)
+    {
+        perror("Erro pthread_join fill1.");
+        exit(1);
+    }
+    if (pthread_join(fill2, NULL) != 0)
+    {
+        perror("Erro thread fill2");
+        exit(1);
+    }
 
     print_matrix(tm.matrix1, LINES, COLUMNS);
     print_matrix(tm.matrix2, LINES, COLUMNS);
@@ -53,14 +70,23 @@ int main()
     {
         sd_threads[i].index = i;
         sd_threads[i].tm = &tm;
-        pthread_create(&threads[i], NULL, multiply_matrices, &sd_threads[i]);
+        if (pthread_create(&threads[i], NULL, multiply_matrices, &sd_threads[i]) != 0)
+        {
+            perror("Erro pthread_create");
+            exit(1);
+        }
     }
 
     for (i = 0; i < MAX_THREADS; ++i)
     {
-        pthread_join(threads[i], NULL);
+        if (pthread_join(threads[i], NULL) != 0)
+        {
+            perror("Erro pthread_join");
+            exit(1);
+        }
     }
     print_matrix(tm.result, LINES, COLUMNS);
+    freematrix(&tm);
     return 0;
 }
 
@@ -131,6 +157,9 @@ void *multiply_matrices(void *args)
     int index = sd->index;
 
     int i, j, k;
+    /*
+        Multiply only the line index of the thread.
+    */
     for (i = index; i < index + 1; ++i)
     {
         for (j = 0; j < NUM_OF_MULTS; ++j)
@@ -142,5 +171,19 @@ void *multiply_matrices(void *args)
         }
     }
 
-   pthread_exit(0);
+    pthread_exit(0);
+}
+
+void freematrix(matrices *mt)
+{
+    int i;
+    for (i = 0; i < LINES; i++)
+    {
+        free(mt->matrix1[i]);
+        free(mt->matrix2[i]);
+        free(mt->result[i]);
+    }
+    free(mt->matrix1);
+    free(mt->matrix2);
+    free(mt->result);
 }
