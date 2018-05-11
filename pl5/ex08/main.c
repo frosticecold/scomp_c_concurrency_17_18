@@ -68,19 +68,19 @@ void *docalc(void *args)
     }
     if (pthread_mutex_lock(&mutex[thread_id]) != 0)
     {
-        pthread_exit((void*)1);
+        pthread_exit((void *)1);
     }
     for (i = thread_id * STEP; i < limit; i++)
         printf("Result[%d]=%d\n", i, result[i]);
     if (pthread_mutex_unlock(&mutex[thread_id]) != 0)
     {
-        pthread_exit((void*)1);
+        pthread_exit((void *)1);
     }
     if (thread_id < NUM_THREADS - 1)
     {
         if (pthread_mutex_unlock(&mutex[thread_id + 1]) != 0)
         {
-            pthread_exit((void*)1);
+            pthread_exit((void *)1);
         }
     }
     pthread_exit(0);
