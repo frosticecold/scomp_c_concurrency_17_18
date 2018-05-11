@@ -30,10 +30,10 @@ void generate_number()
         for (j = 0; j < KEY_SIZE; j++)
         {
             do
-            {
+            { // do while loop to assure it is different from ihts set
                 number = (rand() % TOTAL_NUM + 1);
                 if (number == 0)
-                    number = 1;
+                    number = 1; //random number includes zero if so turn it into a 1
             } while (keys[i][0] == number || keys[i][1] == number || keys[i][2] == number || keys[i][3] == number || keys[i][4] == number);
             keys[i][j] = number;
         }
@@ -43,10 +43,13 @@ void generate_number()
 void *thread_func(void *args)
 {
     int *thread_id = (int *)args;
-    int begin = (*thread_id) * NUM_PER_THREAD;
+    int begin = (*thread_id) * NUM_PER_THREAD; // make sure each thread begins into its interval
     int end = begin + NUM_PER_THREAD;
     int j = 0;
-    pthread_mutex_lock(&mutex[*thread_id]);
+    if (pthread_mutex_lock(&mutex[*thread_id]) != 0) //make sure is the time of eache thread to calculate
+    {
+        perror("Error mutex lock");
+    }
     for (; begin < end; begin++)
     {
         for (j = 0; j < KEY_SIZE; j++)
@@ -56,7 +59,11 @@ void *thread_func(void *args)
             total++;
         }
     }
-    pthread_mutex_unlock(&mutex[*thread_id]);
+    if (pthread_mutex_unlock(&mutex[*thread_id]) != 0)//notifies its over
+    {
+        perror("Error unlocking mutex");
+    }
+
     if (*thread_id < THREAD_SIZE - 1) // confirm it doesnt unlock invalid mutex
     {                                 // if mutex 9 is not unlocking unexisting mutex 10
         pthread_mutex_unlock(&mutex[(*thread_id) + 1]);
@@ -71,14 +78,14 @@ void function_initialize()
     for (i = 0; i < THREAD_SIZE; i++)
     {
 
-        if (pthread_mutex_init(&mutex[i], NULL) != 0)
+        if (pthread_mutex_init(&mutex[i], NULL) != 0) //initalize mutexes
         {
             perror("Error mutex creation\n");
         }
         if (i > 0)
         {
 
-            if (pthread_mutex_lock(&mutex[i]) != 0)
+            if (pthread_mutex_lock(&mutex[i]) != 0) // locking the ones after the mutext position zero
             {
                 perror("error locking mutex\n");
             }
@@ -118,14 +125,12 @@ int main()
         }
     }
     /*====Threads terminated===================*/
-    int temp = 0;
+    
     for (i = 0; i < TOTAL_NUM; i++)
     {
-        temp += statistics[i];
         printf("Number: %d --- Times: %d\n", i + 1, statistics[i]);
     }
     printf("Total %d\n", total);
 
-    printf("Temp %d\n", temp);
     return 0;
 }
