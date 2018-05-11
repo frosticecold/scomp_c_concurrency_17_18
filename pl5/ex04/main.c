@@ -63,7 +63,7 @@ int main()
 
     print_matrix(tm.matrix1, LINES, COLUMNS);
     print_matrix(tm.matrix2, LINES, COLUMNS);
-    pthread_t threads[MAX_THREADS];
+    pthread_t   threads[MAX_THREADS];
     shared_data sd_threads[MAX_THREADS];
     int i;
     for (i = 0; i < MAX_THREADS; ++i)

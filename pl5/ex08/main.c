@@ -22,17 +22,29 @@ int main()
 
     for (i = 0; i < NUM_THREADS; i++)
     {
-        pthread_mutex_init(&mutex[i], NULL);
+        if (pthread_mutex_init(&mutex[i], NULL) != 0)
+        {
+            perror("Erro ao criar mutex.");
+            exit(1);
+        }
         if (i > 0)
         {
-            pthread_mutex_lock(&mutex[i]);
+            if (pthread_mutex_lock(&mutex[i]) != 0)
+            {
+                perror("Erro ao fazer mutex lock");
+                exit(1);
+            }
         }
     }
     pthread_t threads[NUM_THREADS];
     for (i = 0; i < NUM_THREADS; i++)
     {
         th_index[i] = i;
-        pthread_create(&threads[i], NULL, docalc, &th_index[i]);
+        if (pthread_create(&threads[i], NULL, docalc, &th_index[i]) != 0)
+        {
+            perror("Erro ao criar thread.");
+            exit(1);
+        }
     }
     for (i = 0; i < NUM_THREADS; i++)
     {
@@ -54,13 +66,22 @@ void *docalc(void *args)
     {
         result[i] = data[i] * mult + sum;
     }
-    pthread_mutex_lock(&mutex[thread_id]);
+    if (pthread_mutex_lock(&mutex[thread_id]) != 0)
+    {
+        pthread_exit((void*)1);
+    }
     for (i = thread_id * STEP; i < limit; i++)
         printf("Result[%d]=%d\n", i, result[i]);
-    pthread_mutex_unlock(&mutex[thread_id]);
+    if (pthread_mutex_unlock(&mutex[thread_id]) != 0)
+    {
+        pthread_exit((void*)1);
+    }
     if (thread_id < NUM_THREADS - 1)
     {
-        pthread_mutex_unlock(&mutex[thread_id + 1]);
+        if (pthread_mutex_unlock(&mutex[thread_id + 1]) != 0)
+        {
+            pthread_exit((void*)1);
+        }
     }
     pthread_exit(0);
 }
