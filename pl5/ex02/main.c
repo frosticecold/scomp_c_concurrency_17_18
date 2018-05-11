@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define NUM_THREADS 5
 #define DATA_STR_SIZE 64
@@ -28,13 +29,20 @@ int main()
     int i;
     for (i = 0; i < ARRAY_SIZE; i++)
     {
-        pthread_create(&threads[i], NULL, print_struct, &array[i]);
+        if (pthread_create(&threads[i], NULL, print_struct, &array[i]) != 0)
+        {
+            perror("Erro ao criar a thread...");
+            exit(1);
+        }
     }
 
     printf("====Vamos esperar por todas as threads====\n");
     for (i = 0; i < ARRAY_SIZE; i++)
     {
-        pthread_join(threads[i], NULL);
+        if(pthread_join(threads[i], NULL)!=0){
+            perror("Erro pthread_join.");
+            exit(1);
+        }
     }
     printf("====Todas as threads terminarem====");
     return 0;
