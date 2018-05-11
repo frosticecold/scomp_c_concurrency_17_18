@@ -13,8 +13,8 @@
 #define NUM_PER_THREAD ARRAY_SIZE/THREAD_SIZE
 
 int array [ARRAY_SIZE];
-
 int number;
+int* thread_id;
 
 void generate_number(int* args){
     int i =0;
@@ -25,19 +25,14 @@ void generate_number(int* args){
 }
 
 void* find_number(void* args){
-    int exit_value= *((int*) args);
+    thread_id= (int*) args;
+    
     int begin = *((int*) args) * NUM_PER_THREAD;
     int end = begin + NUM_PER_THREAD;
-    int flag = 0;
     for( ;begin<end; begin++){
         if(array[begin] == number){
-            printf("Number in the array\n");
-            flag = 1;
-            break;
+            pthread_exit((void*)thread_id);
         }
-    }
-    if(flag == 1){
-        pthread_exit((void*)&exit_value);
     }
     pthread_exit(NULL);
 }
@@ -46,7 +41,6 @@ int main()
 {
     int index [THREAD_SIZE];
     srand(time(NULL));
-    void* ret [THREAD_SIZE] ;
 
     number = rand() % ARRAY_SIZE;
 
@@ -66,9 +60,13 @@ int main()
     printf("====Vamos esperar por todas as threads====\n");
     for (i = 0; i < THREAD_SIZE; i++)
     {
-        pthread_join(threads[i], &ret[i]);
-        if(ret[i] != NULL){
-            printf("Thread %s found the number\n",*((int*)ret[i]));
+        void* ret;
+        if(pthread_join(threads[i],&ret) != 0 ){
+            perror("Error pthread join\n");
+        }
+        if(ret != NULL){
+            int* n = (int*)ret;
+            printf("Thread %d found the number\n",*n);
         }
     }
     printf("====Todas as threads terminarem====\n");
