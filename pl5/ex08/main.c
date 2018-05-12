@@ -48,7 +48,24 @@ int main()
     }
     for (i = 0; i < NUM_THREADS; i++)
     {
-        pthread_join(threads[i], NULL);
+        if (pthread_join(threads[i], NULL) != 0)
+        {
+            perror("Erro pthread join.");
+            exit(1);
+        }
+    }
+    for (i = 0; i < NUM_THREADS; i++)
+    {
+        if (pthread_mutex_unlock(&mutex[i]) != 0)
+        {
+            perror("Erro a fazer unlock.");
+            exit(1);
+        }
+        if (pthread_mutex_destroy(&mutex[i]) != 0)
+        {
+            perror("Erro destruir mutex");
+            exit(1);
+        }
     }
     return 0;
 }
