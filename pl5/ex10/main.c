@@ -81,20 +81,24 @@ pthread_cond_t computing_condition = PTHREAD_COND_INITIALIZER;
     threads
 */
 pthread_t threads[MAX_THREADS];
-/*
-    Functions prototypes
-*/
 
 /*
     Wall variable
 */
 unsigned int wall_variable = 0;
 
+/*
+    Functions prototypes
+*/
 void populate_database();
 void create_sync_data();
 void showLowestCostHypermarket();
 void *filter_function_thread(void *args);
 void *computing_function_thread(void *args);
+
+/*
+    Main thread
+*/
 int main()
 {
     populate_database();
