@@ -157,6 +157,40 @@ int main()
         }
     }
     showLowestCostHypermarket();
+    /*
+        Destroy mutex and conds
+    */
+    for (i = 0; i < FILTERING_THREADS; i++)
+    {
+        if (pthread_mutex_destroy(&mutex_filtering[i]) != 0)
+        {
+            perror("Error destroying mutex");
+            exit(1);
+        }
+    }
+
+    if (pthread_mutex_destroy(&mutex_cond) != 0)
+    {
+        perror("Error destroying cond mutex");
+        exit(1);
+    }
+    if (pthread_mutex_destroy(&mutex_lowestcost) != 0)
+    {
+        perror("Error destroying lowestcost mutex");
+        exit(1);
+    }
+    if (pthread_mutex_destroy(&mutex_wall) != 0)
+    {
+        perror("Error destroying lowestcost mutex");
+        exit(1);
+    }
+
+    if (pthread_cond_destroy(&computing_condition) != 0)
+    {
+        perror("Error destroying computing condition");
+        exit(1);
+    }
+
     return 0;
 }
 
