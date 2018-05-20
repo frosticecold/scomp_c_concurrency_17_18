@@ -25,7 +25,7 @@ clean:
 	rm -f ${OBJFILES} ${EXEC}
 
 vg:
-	valgrind ./${EXEC}
+	valgrind --tool=helgrind -v ./${EXEC}
 
 debug:
 	gdb -tui ${EXEC}

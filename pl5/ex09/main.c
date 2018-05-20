@@ -138,6 +138,9 @@ int main()
             perror("Error pthread join\n");
         }
     }
+    pthread_mutex_destroy(&mutex_city_A_to_B);
+    pthread_mutex_destroy(&mutex_city_B_to_C);
+    pthread_mutex_destroy(&mutex_city_B_to_D);
     /*====Threads terminated===================*/
     return 0;
 }

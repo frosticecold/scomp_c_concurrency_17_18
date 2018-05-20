@@ -17,8 +17,10 @@
 int keys[ARRAY_SIZE][KEY_SIZE];
 int statistics[TOTAL_NUM];
 int total = 0;
+int flags[THREAD_SIZE];
 
 pthread_mutex_t mutex[THREAD_SIZE];
+pthread_cond_t mutex_cond[THREAD_SIZE];
 
 void generate_number()
 {
@@ -50,6 +52,16 @@ void *thread_func(void *args)
     {
         perror("Error mutex lock");
     }
+
+    while (flags[*thread_id] == 0)
+    {
+        pthread_cond_wait(&mutex_cond[*thread_id], &mutex[*thread_id]);
+    }
+    if (pthread_mutex_unlock(&mutex[*thread_id]) != 0) //make sure is the time of eache thread to calculate
+    {
+        perror("Error mutex lock");
+    }
+
     for (; begin < end; begin++)
     {
         for (j = 0; j < KEY_SIZE; j++)
@@ -59,14 +71,24 @@ void *thread_func(void *args)
             total++;
         }
     }
-    if (pthread_mutex_unlock(&mutex[*thread_id]) != 0)//notifies its over
-    {
-        perror("Error unlocking mutex");
-    }
 
     if (*thread_id < THREAD_SIZE - 1) // confirm it doesnt unlock invalid mutex
-    {                                 // if mutex 9 is not unlocking unexisting mutex 10
-        pthread_mutex_unlock(&mutex[(*thread_id) + 1]);
+    {
+        // if mutex 9 is not unlocking unexisting mutex 10
+        if (pthread_mutex_lock(&mutex[(*thread_id) + 1]) != 0) //make sure is the time of eache thread to calculate
+        {
+            perror("Error mutex lock");
+        }
+
+        flags[*thread_id + 1] = 1;
+        if (pthread_cond_signal(&mutex_cond[(*thread_id) + 1]) != 0) //notifies its over
+        {
+            perror("Error unlocking mutex");
+        }
+        if (pthread_mutex_unlock(&mutex[(*thread_id) + 1]) != 0) //notifies its over
+        {
+            perror("Error unlocking mutex");
+        }
     }
     pthread_exit(NULL);
 }
@@ -77,18 +99,14 @@ void function_initialize()
     int i = 0;
     for (i = 0; i < THREAD_SIZE; i++)
     {
-
+        flags[i] = 0;
         if (pthread_mutex_init(&mutex[i], NULL) != 0) //initalize mutexes
         {
             perror("Error mutex creation\n");
         }
-        if (i > 0)
+        if (pthread_cond_init(&mutex_cond[i], NULL) != 0) //initalize mutexes
         {
-
-            if (pthread_mutex_lock(&mutex[i]) != 0) // locking the ones after the mutext position zero
-            {
-                perror("error locking mutex\n");
-            }
+            perror("Error mutex creation\n");
         }
     }
     for (i = 0; i < TOTAL_NUM; i++)
@@ -106,6 +124,7 @@ int main()
 
     function_initialize(); // initialize mutexes, array and statistics
     int i = 0;
+
     for (; i < THREAD_SIZE; i++)
     {
         /*====Creating threads==================*/
@@ -115,22 +134,39 @@ int main()
             perror("error creating thread\n");
         }
     }
+
+    pthread_mutex_lock(&mutex[0]);
+    flags[0] = 1;
+    pthread_cond_signal(&mutex_cond[0]);
+    pthread_mutex_unlock(&mutex[0]);
+
     /*====Waiting for the threads==============*/
 
     for (i = 0; i < THREAD_SIZE; i++)
     {
+
         if (pthread_join(threads[i], NULL) != 0)
         {
             perror("Error pthread join\n");
         }
     }
     /*====Threads terminated===================*/
-    
+
     for (i = 0; i < TOTAL_NUM; i++)
     {
         printf("Number: %d --- Times: %d\n", i + 1, statistics[i]);
     }
     printf("Total %d\n", total);
-
+    for (i = 0; i < THREAD_SIZE; i++)
+    {
+        if (pthread_mutex_destroy(&mutex[i]) != 0)
+        {
+            perror("Error destroying mutex");
+        }
+        if (pthread_cond_destroy(&mutex_cond[i]) != 0)
+        {
+            perror("Error destroying mutex");
+        }
+    }
     return 0;
 }

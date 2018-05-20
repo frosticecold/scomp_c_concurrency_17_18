@@ -96,5 +96,12 @@ int main()
     printf("Lowest value is: %d\n", lowest_value);
     printf("Highest value is: %d\n", highest_value);
     printf("Average is: %.2f\n", average);
+
+    for (i = 0; i < THREAD_SIZE; i++)
+        if (pthread_mutex_destroy(&mutex[i]) != 0)
+        {
+            perror("Error destroying mutex");
+        }
+
     return 0;
 }
